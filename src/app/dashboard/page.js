@@ -52,7 +52,7 @@ export default function Dashboard() {
           "branding",
           "social-media",
           "marketing",
-          "app-dev",
+          
         ];
 
         setContacts(data.filter((c) => allowed.includes(c.service)));
