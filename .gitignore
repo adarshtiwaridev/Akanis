@@ -6,8 +6,8 @@ node_modules/
 out/
 
 # Env
-.env
-.env.local
+# .env
+# .env.local
 
 # Logs
 logs
