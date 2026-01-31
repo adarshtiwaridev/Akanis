@@ -1,165 +1,260 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Sun, Moon, Upload, CheckCircle, XCircle } from "lucide-react";
+import {
+  Upload,
+  X,
+  CheckCircle,
+  XCircle,
+  Image as ImageIcon,
+  Video,
+} from "lucide-react";
+
+/* ================= SMALL HELPER ================= */
+function Detail({ label, value }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <span className="text-foreground/60">{label}</span>
+      <span className="font-medium text-right">
+        {value || "—"}
+      </span>
+    </div>
+  );
+}
 
 export default function Dashboard() {
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // // 🔐 Auth Guard
-  // useEffect(() => {
-  //   const token = localStorage.getItem("authToken");
-  //   if (!token) {
-  //     router.replace("/login");
-  //   } else {
-  //     setMounted(true);
-  //   }
-  // }, [router]);
+  // upload modal
+  const [modalType, setModalType] = useState(null); // photo | video
+  const [file, setFile] = useState(null);
+  const [title, setTitle] = useState("");
+  const [tags, setTags] = useState("");
 
-  // if (!mounted) return null;
+  // detail modal
+  const [selectedContact, setSelectedContact] = useState(null);
 
-  // Dummy contact data (replace with API later)
-  const contacts = [
-    {
-      id: 1,
-      name: "Rahul Sharma",
-      email: "rahul@gmail.com",
-      service: "Cinematography",
-      reviewed: false,
-    },
-    {
-      id: 2,
-      name: "Ananya Verma",
-      email: "ananya@gmail.com",
-      service: "Brand Film",
-      reviewed: true,
-    },
-  ];
+  /* ================= FETCH CONTACTS ================= */
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const res = await fetch("/api/contact");
+        if (!res.ok) throw new Error("Failed to fetch");
 
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
+        const data = await res.json();
+
+        const allowed = [
+          "ad-shoot",
+          "photo-shoot",
+          "videography",
+          "video-production",
+          "branding",
+          "social-media",
+          "marketing",
+          "app-dev",
+        ];
+
+        setContacts(data.filter((c) => allowed.includes(c.service)));
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContacts();
+  }, []);
+
+  /* ================= UPLOAD ================= */
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("tags", tags);
+    formData.append("type", modalType);
+
+    await fetch("/api/gallery/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    setModalType(null);
+    setFile(null);
+    setTitle("");
+    setTags("");
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors">
+    <div className="min-h-screen bg-background text-foreground mt-20 px-8 py-10">
 
       {/* ================= HEADER ================= */}
-      <header className="flex items-center justify-between px-8 py-6 border-b border-border">
+      <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-xl font-bold tracking-wide">
-            AKANIS <span className="opacity-70">PRODUCTION</span>
-          </h1>
+          <h1 className="text-3xl font-extrabold">Media Dashboard</h1>
           <p className="text-sm text-foreground/60">
-            Crafting cinematic stories that last
+            Photography, reels & video management
           </p>
         </div>
 
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full border border-border hover:bg-foreground/5 transition"
-        >
-          <Sun className="block dark:hidden" size={18} />
-          <Moon className="hidden dark:block" size={18} />
-        </button>
-      </header>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setModalType("photo")}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white font-medium"
+          >
+            <ImageIcon size={16} />
+            Upload Photo
+          </button>
 
-      {/* ================= MAIN ================= */}
-      <main className="px-8 py-10 max-w-7xl mx-auto space-y-16">
+          <button
+            onClick={() => setModalType("video")}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white font-medium"
+          >
+            <Video size={16} />
+            Upload Video
+          </button>
+        </div>
+      </div>
 
-        {/* ===== STATS ===== */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { label: "Total Projects", value: "128" },
-            { label: "Active Clients", value: "45" },
-            { label: "Contact Requests", value: contacts.length },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-card border border-border rounded-2xl p-6"
-            >
-              <p className="text-sm text-foreground/60 mb-2">
-                {item.label}
-              </p>
-              <p className="text-3xl font-semibold">
-                {item.value}
-              </p>
-            </div>
-          ))}
-        </section>
+      {/* ================= CONTACT TABLE ================= */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="max-h-[420px] overflow-y-auto">
+          <table className="w-full text-left">
+            <thead className="bg-foreground/5 sticky top-0">
+              <tr>
+                <th className="px-6 py-4 text-sm font-medium">Name</th>
+                <th className="px-6 py-4 text-sm font-medium">Email</th>
+                <th className="px-6 py-4 text-sm font-medium">Service</th>
+                <th className="px-6 py-4 text-sm font-medium">Status</th>
+              </tr>
+            </thead>
 
-        {/* ===== CONTACT FORM LIST ===== */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold">
-              Contact Form Submissions
-            </h2>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-left">
-              <thead className="bg-foreground/5">
+            <tbody>
+              {loading ? (
                 <tr>
-                  <th className="px-6 py-4 text-sm font-medium">Name</th>
-                  <th className="px-6 py-4 text-sm font-medium">Email</th>
-                  <th className="px-6 py-4 text-sm font-medium">Service</th>
-                  <th className="px-6 py-4 text-sm font-medium">Status</th>
+                  <td colSpan="4" className="px-6 py-6 text-center text-foreground/60">
+                    Loading data...
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {contacts.map((c) => (
+              ) : (
+                contacts.map((c) => (
                   <tr
-                    key={c.id}
-                    className="border-t border-border"
+                    key={c._id}
+                    onClick={() => setSelectedContact(c)}
+                    className="border-t border-border cursor-pointer hover:bg-foreground/5 transition"
                   >
                     <td className="px-6 py-4">{c.name}</td>
                     <td className="px-6 py-4">{c.email}</td>
-                    <td className="px-6 py-4">{c.service}</td>
+                    <td className="px-6 py-4 capitalize">
+                      {c.service.replace("-", " ")}
+                    </td>
                     <td className="px-6 py-4">
-                      {c.reviewed ? (
+                      {c.isRead ? (
                         <span className="flex items-center gap-2 text-green-500">
                           <CheckCircle size={16} /> Reviewed
                         </span>
                       ) : (
                         <span className="flex items-center gap-2 text-red-500">
-                          <XCircle size={16} /> Unreviewed
+                          <XCircle size={16} /> New
                         </span>
                       )}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ================= CONTACT DETAIL MODAL ================= */}
+      {selectedContact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl rounded-2xl bg-card border border-border p-6">
+
+            <button
+              onClick={() => setSelectedContact(null)}
+              className="absolute right-4 top-4 text-foreground/60"
+            >
+              <X />
+            </button>
+
+            <h2 className="text-2xl font-bold mb-6">
+              Contact Details
+            </h2>
+
+            <div className="space-y-3 text-sm">
+              <Detail label="Name" value={selectedContact.name} />
+              <Detail label="Email" value={selectedContact.email} />
+              <Detail label="Phone" value={selectedContact.phone} />
+              <Detail label="Service" value={selectedContact.service} />
+              <Detail label="Budget" value={selectedContact.budget} />
+              <Detail label="Location" value={selectedContact.location} />
+              <Detail label="Status" value={selectedContact.status} />
+              <Detail
+                label="Created At"
+                value={new Date(selectedContact.createdAt).toLocaleString()}
+              />
+
+              <div>
+                <p className="font-medium text-foreground/70 mb-1">Message</p>
+                <p className="rounded-xl border border-border bg-background p-3">
+                  {selectedContact.message}
+                </p>
+              </div>
+            </div>
           </div>
-        </section>
+        </div>
+      )}
 
-        {/* ===== GALLERY UPLOAD ===== */}
-        <section className="flex items-center justify-between bg-card border border-border rounded-2xl p-6">
-          <div>
-            <h3 className="text-xl font-semibold">
-              Gallery Management
-            </h3>
-            <p className="text-sm text-foreground/60">
-              Upload and manage production images
-            </p>
+      {/* ================= UPLOAD MODAL ================= */}
+      {modalType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg rounded-2xl bg-card border border-border p-6">
+
+            <button
+              onClick={() => setModalType(null)}
+              className="absolute right-4 top-4 text-foreground/60"
+            >
+              <X />
+            </button>
+
+            <h2 className="text-2xl font-bold mb-4">
+              Upload {modalType === "photo" ? "Photo" : "Video"}
+            </h2>
+
+            <input
+              type="file"
+              accept={modalType === "photo" ? "image/*" : "video/*"}
+              onChange={(e) => setFile(e.target.files[0])}
+              className="mb-4 w-full"
+            />
+
+            <input
+              placeholder="Title / Description"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="mb-3 w-full rounded-xl border border-border bg-background px-4 py-2"
+            />
+
+            <input
+              placeholder="Tags"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="mb-5 w-full rounded-xl border border-border bg-background px-4 py-2"
+            />
+
+            <button
+              onClick={handleUpload}
+              className="w-full rounded-xl bg-accent py-3 font-semibold text-white"
+            >
+              Upload
+            </button>
           </div>
-
-          <button
-            onClick={() => router.push("/dashboard/gallery-upload")}
-            className="
-              flex items-center gap-2
-              bg-accent text-white
-              px-5 py-3 rounded-xl
-              font-medium hover:opacity-90 transition
-            "
-          >
-            <Upload size={18} />
-            Upload Images
-          </button>
-        </section>
-
-      </main>
+        </div>
+      )}
     </div>
   );
 }

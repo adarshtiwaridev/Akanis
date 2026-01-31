@@ -156,16 +156,11 @@ export async function POST(req) {
 export async function GET() {
   try {
     await dbConnect();
+    const contacts = await Contact.find().sort({ createdAt: -1 });
 
-    const contacts = await Contact.find()
-      .sort({ createdAt: -1 });
-    return NextResponse.json(
-      { contacts
-      },
-      { status: 200 }
-    );  
+    return NextResponse.json(contacts, { status: 200 });
   } catch (error) {
-    console.error("Contact GET error:", error); 
+    console.error("Contact GET error:", error);
     return NextResponse.json(
       { message: "Server error" },
       { status: 500 }
