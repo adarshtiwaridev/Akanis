@@ -194,7 +194,7 @@ export default function Dashboard() {
               <Detail label="Location" value={selectedContact.location} />
               <Detail label="Status" value={selectedContact.status} />
               <Detail
-                label="Created At"
+                label="Booked At"
                 value={new Date(selectedContact.createdAt).toLocaleString()}
               />
 

@@ -147,14 +147,14 @@ const Hero = () => {
             </motion.div>
 
             <motion.div custom={3} variants={textVariant} className="mt-12 flex items-center gap-6">
-              <button href="/contact" className="group relative bg-foreground text-background px-8 py-4 overflow-hidden rounded-full font-bold uppercase text-xs tracking-widest transition-transform hover:scale-105">
+              <button href="#contact" className="group relative bg-foreground text-background px-8 py-4 overflow-hidden rounded-full font-bold uppercase text-xs tracking-widest transition-transform hover:scale-105">
                 <span className="relative z-10 flex items-center gap-2">
                   Start Project <ArrowUpRight size={16} />
                 </span>
                 <div className="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300" />
               </button>
 
-              <button href="/contact" className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-bold hover:text-accent transition-colors">
+              <button href="#contact" className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-bold hover:text-accent transition-colors">
                 <Phone size={16} /> Contact Studio
               </button>
             </motion.div>
