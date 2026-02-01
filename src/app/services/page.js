@@ -89,19 +89,26 @@ const services = [
     size: "md:col-span-3",
     priority: 5,
   },
-  {
-    id: "web",
-    category: "Technology",
-    title: "Web Design & Development",
-    icon: <Globe size={24} />,
-    image:
-      "/photos/web.avif",
-    description:
-      "Fast, responsive websites built for performance, aesthetics, and conversions.",
-    details: ["UI/UX Design", "SEO Optimization", "Performance Tuning"],
-    size: "md:col-span-3",
-    priority: 6,
-  },
+{
+  id: "web",
+  category: "Technology",
+  title: "Web Design & Development",
+  icon: <Globe size={22} />,
+  image: "/photos/web.avif",
+  description:
+    "Modern, custom-built websites from scratch—fast, scalable, dynamic, and designed to convert users into customers.",
+  details: [
+    "Custom Website from Scratch",
+    "Dynamic & Scalable Architecture",
+    "UI/UX Focused Design",
+    "SEO & Performance Optimization",
+    "CMS / Admin Panel Integration",
+    "API & Third-Party Integrations",
+  ],
+  size: "md:col-span-3",
+  priority: 6,
+}
+,
 ];
 
 export default memo(function ServicesPage() {
@@ -175,104 +182,127 @@ export default memo(function ServicesPage() {
         </div>
 
           {/* MODAL */}
-       {/* MODAL */}
 <AnimatePresence>
-      {activeService && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 overflow-hidden">
-          
-          {/* BACKDROP - Minimalist approach with heavy blur */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedId(null)}
-            className="absolute inset-0 bg-white/80 dark:bg-black/90 backdrop-blur-2xl"
+  {activeService && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
+
+      {/* BACKDROP */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => setSelectedId(null)}
+        className="absolute inset-0 bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-black/90 dark:via-black/85 dark:to-black/80 backdrop-blur-2xl"
+      />
+
+      {/* MODAL */}
+      <motion.div
+        layoutId={activeService.id}
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 260, damping: 22 }}
+        className="relative w-full max-w-[92vw] sm:max-w-3xl rounded-2xl md:rounded-[2rem] overflow-hidden
+                   bg-white dark:bg-[#0c0c0c]
+                   border border-zinc-100 dark:border-white/5
+                   shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)]
+                   flex flex-col md:flex-row "
+      >
+        {/* CLOSE */}
+        <button
+          onClick={() => setSelectedId(null)}
+          className="absolute top-4 right-4 z-30 rounded-full bg-white/70 dark:bg-black/60 backdrop-blur
+                     p-2 text-zinc-400 hover:text-black dark:hover:text-white transition"
+        >
+          <X size={16} />
+        </button>
+
+        {/* IMAGE */}
+        <div className="md:w-5/12 h-44 sm:h-52 md:h-auto relative overflow-hidden">
+          <Image
+            src={activeService.image}
+            alt={activeService.title}
+            fill
+            className="object-cover scale-105 transition-transform duration-700"
           />
-
-          {/* MODAL CONTAINER */}
-          <motion.div
-            layoutId={activeService.id}
-            className="relative w-full max-w-4xl bg-white dark:bg-[#0c0c0c] rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-none border border-zinc-100 dark:border-white/5 flex flex-col md:flex-row"
-          >
-            {/* CLOSE BUTTON - Repositioned for cleaner UI */}
-            <button
-              onClick={() => setSelectedId(null)}
-              className="absolute top-8 right-8 z-30 p-2 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
-            >
-              <X size={24} strokeWidth={1.5} />
-            </button>
-
-            {/* LEFT: VISUAL SECTION */}
-            <div className="md:w-5/12 h-64 md:h-auto relative overflow-hidden group">
-              <Image
-                src={activeService.image}
-                alt={activeService.title}
-                fill
-                className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000 scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-transparent" />
-              
-              {/* Floating Badge (Visual Interest) */}
-              <div className="absolute bottom-10 left-10 hidden md:block">
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl">
-                   <div className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mb-1 opacity-60">Service Code</div>
-                   <div className="text-white text-xs font-mono uppercase tracking-widest">{activeService.id}-0922</div>
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT: CONTENT SECTION */}
-            <div className="md:w-7/12 p-10 md:p-16 flex flex-col bg-[#fcfcfc] dark:bg-transparent">
-              
-              <div className="mb-12">
-                <span className="inline-block text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[0.3em] text-[10px] mb-4">
-                  Full Capabilities
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.9] dark:text-white">
-                  {activeService.title}
-                </h2>
-              </div>
-
-              <div className="space-y-8 flex-grow">
-                {/* DESCRIPTION */}
-                <p className="text-zinc-500 dark:text-zinc-400 text-lg font-medium leading-relaxed max-w-md italic">
-                  "{activeService.description}"
-                </p>
-
-                {/* GRID DETAILS - Cleaner alignment */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                  {activeService.details.map((detail, idx) => (
-                    <div key={idx} className="flex items-center gap-3 py-2 border-b border-zinc-100 dark:border-white/5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-zinc-800 dark:text-zinc-200">
-                        {detail}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* ACTION AREA */}
-              <div className="mt-16 pt-8 border-t border-zinc-100 dark:border-white/5 flex flex-col sm:flex-row items-center gap-6">
-                <motion.a
-                  href="#contact"
-                  whileHover={{ x: 5 }}
-                  onClick={() => setSelectedId(null)}
-                  className="w-full sm:w-auto px-10 h-16 bg-black dark:bg-white text-white dark:text-black rounded-full font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 group"
-                >
-                  Get a Quote 
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </motion.a>
-                
-                <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
-                  Avg. Response Time: 2hr
-                </span>
-              </div>
-            </div>
-          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/10 to-transparent" />
         </div>
-      )}
-    </AnimatePresence>
+
+        {/* CONTENT */}
+        <div className="md:w-7/12 p-6 sm:p-8 md:p-10 flex flex-col">
+
+          {/* HEADER */}
+          <div className="mb-6">
+            <span className="inline-block text-[10px] font-bold uppercase tracking-[0.35em]
+                             text-blue-600 dark:text-blue-400">
+              Full Capabilities
+            </span>
+            <h2 className="mt-3 text-2xl sm:text-3xl md:text-5xl
+                           font-black tracking-tight leading-[0.95]
+                           text-zinc-900 dark:text-white">
+              {activeService.title}
+            </h2>
+          </div>
+
+          {/* BODY */}
+          <div className="flex-grow space-y-6">
+            <p className="text-sm sm:text-base leading-relaxed
+                          text-zinc-600 dark:text-zinc-400
+                          max-w-sm italic">
+              “{activeService.description}”
+            </p>
+
+            {/* CHECK MARK FEATURES */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeService.details.map((detail, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3"
+                >
+                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center
+                                   rounded-full bg-blue-600/10
+                                   text-blue-600 dark:bg-blue-500/15 dark:text-blue-400
+                                   text-xs font-black">
+                    ✓
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest
+                                   text-zinc-800 dark:text-zinc-200">
+                    {detail}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ACTION */}
+          <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-white/5
+                          flex flex-col sm:flex-row items-center gap-4">
+            <motion.a
+              href="#contact"
+              whileHover={{ x: 6 }}
+              onClick={() => setSelectedId(null)}
+              className="w-full sm:w-auto h-12 px-6
+                         rounded-full bg-gradient-to-r from-black to-zinc-800
+                         dark:from-white dark:to-zinc-200
+                         text-white dark:text-black
+                         text-[10px] font-black uppercase tracking-widest
+                         flex items-center justify-center gap-3"
+            >
+              Get a Quote
+              <ArrowRight size={14} />
+            </motion.a>
+
+            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+              Avg response: 2 hr
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )}
+</AnimatePresence>
+
+
 
       </div>
     </main>

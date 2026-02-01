@@ -5,13 +5,103 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 const items = [
-  { id: 1, title: "Cinematic Reel", category: "Film", src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=800" },
-  { id: 2, title: "E-Commerce OS", category: "Dev", src: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800" },
-  { id: 3, title: "Vogue Edit", category: "Photography", src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800" },
-  { id: 4, title: "Next-Gen App", category: "Dev", src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800" },
-  { id: 5, title: "Urban Narrative", category: "Film", src: "https://images.unsplash.com/photo-1502982722823-b9210447026e?q=80&w=800" },
-  { id: 6, title: "Abstract Logic", category: "Dev", src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800" },
+  /* ================= VIDEO / REELS ================= */
+
+  {
+    id: 1,
+    title: "Brand Launch Film",
+    category: "Videography",
+    type: "video",
+    src: "/photos/mountain.jpg",
+    details: {
+      platform: "YouTube / Instagram",
+      duration: "60 sec",
+      work: "Direction • Shooting • Color Grading",
+    },
+  },
+  {
+    id: 2,
+    title: "Cinematic Product Reel",
+    category: "Video Reel",
+    type: "video",
+    src: "/photos/reel.jpg",
+    details: {
+      platform: "Instagram Reels",
+      duration: "30 sec",
+      work: "Concept • Filming • Editing",
+    },
+  },
+  {
+    id: 3,
+    title: "Social Media Ad Reel",
+    category: "Brand Ads",
+    type: "video",
+    src: "/photos/netflix.jpg",
+    details: {
+      platform: "Instagram / Facebook",
+      duration: "20 sec",
+      work: "Ad Creative • Motion • CTA",
+    },
+  },
+
+  /* ================= WEBSITES ================= */
+
+  {
+    id: 4,
+    title: "E-Commerce Website",
+    category: "Web Development",
+    type: "web",
+    src: "/photos/web.avif",
+    details: {
+      tech: "Next.js • Tailwind • Stripe",
+      features: "Cart • Payments • Admin Panel",
+      status: "Live Project",
+    },
+  },
+  {
+    id: 5,
+    title: "Startup Landing Page",
+    category: "Web Design",
+    type: "web",
+    src: "/photos/marketing.avif",
+    details: {
+      tech: "React • Framer Motion",
+      features: "SEO • Animations • Lead Capture",
+      status: "Client Project",
+    },
+  },
+
+  /* ================= APPS ================= */
+
+  {
+    id: 6,
+    title: "Mobile App Interface",
+    category: "App Development",
+    type: "app",
+    src: "/photos/mobile-app.jpg",
+    details: {
+      tech: "React Native",
+      features: "Auth • API • Notifications",
+      status: "In Production",
+    },
+  },
+
+  /* ================= BRAND VIDEO ================= */
+
+  {
+    id: 7,
+    title: "Corporate Brand Film",
+    category: "Video Production",
+    type: "video",
+    src: "/photos/brand.jpg",
+    details: {
+      platform: "Website / YouTube",
+      duration: "90 sec",
+      work: "Script • Shoot • Post-Production",
+    },
+  },
 ];
+
 
 const Gallery = () => {
   const containerRef = useRef(null);

@@ -57,9 +57,9 @@ export default function Footer() {
             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Navigation</h3>
             <ul className="space-y-3 text-sm font-medium">
               <FooterLink text="Our Work" />
-              <FooterLink text="Services" />
-              <FooterLink text="About Studio" />
-              <FooterLink text="Contact" />
+              <FooterLink text="service" />
+              <FooterLink text="about" />
+              <FooterLink text="contact" />
             </ul>
           </div>
 

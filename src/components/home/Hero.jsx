@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { Phone, ArrowUpRight, Play, Globe, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import {  useRouter} from 'next/navigation';
 
 const useTypewriter = (words, speed = 120, pause = 1500) => {
   const [text, setText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-
+ 
   useEffect(() => {
     const current = words[wordIndex];
     let timeout;
@@ -48,7 +48,7 @@ const Hero = () => {
     120,
     1200
   );
-
+const router = useRouter();
   const images = [
      "/photos/image03.avif",
     "/photos/image02.avif",
@@ -147,14 +147,14 @@ const Hero = () => {
             </motion.div>
 
             <motion.div custom={3} variants={textVariant} className="mt-12 flex items-center gap-6">
-              <button href="#contact" className="group relative bg-foreground text-background px-8 py-4 overflow-hidden rounded-full font-bold uppercase text-xs tracking-widest transition-transform hover:scale-105">
-                <span className="relative z-10 flex items-center gap-2">
+              <button onClick={() => router.push("#contact")}   className="group relative bg-foreground text-background px-8 py-4 overflow-hidden rounded-full font-bold uppercase text-xs tracking-widest transition-transform hover:scale-105">
+                <span className="relative z-10 flex items-center gap-2" href="#contact">
                   Start Project <ArrowUpRight size={16} />
                 </span>
                 <div className="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300" />
               </button>
 
-              <button href="#contact" className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-bold hover:text-accent transition-colors">
+              <button onClick={() => router.push("/contact")}  className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] font-bold hover:text-accent transition-colors">
                 <Phone size={16} /> Contact Studio
               </button>
             </motion.div>
