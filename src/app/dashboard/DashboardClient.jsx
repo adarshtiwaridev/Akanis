@@ -315,7 +315,7 @@ export default function DashboardClient() {
               className="group relative rounded-xl overflow-hidden border border-border"
             >
               {mediaType === "photo" ? (
-                <img src={item.url} className="h-40 w-full object-cover" />
+                <img src={item.url} className="h-40 w-full object-contain" />
               ) : (
                 <video src={item.url} className="h-40 w-full object-cover" />
               )}
