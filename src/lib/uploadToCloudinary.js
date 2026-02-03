@@ -1,41 +1,36 @@
-import { v2 as cloudinary } from "cloudinary";
+const uploadToCloudinary = (file, type, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const form = new FormData();
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+    form.append("file", file);
+    form.append(
+      "upload_preset",
+      process.env.NEXT_PUBLIC_CLOUDINARY_PRESET
+    );
 
-/**
- * Upload image or video to Cloudinary
- * @param {File} file - browser File object (from formData)
- * @param {Object} options
- */
-export async function uploadToCloudinary(
-  file,
-  {
-    folder = "studio-gallery",
-    resourceType = "auto", // image | video | auto
-    quality,
-    height,
-  } = {}
-) {
-  const buffer = Buffer.from(await file.arrayBuffer());
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        onProgress(percent);
+      }
+    };
 
-  return await new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder,
-          resource_type: resourceType,
-          quality,
-          height,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      )
-      .end(buffer);
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(new Error("Cloudinary upload failed"));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Upload error"));
+
+    const endpoint = `https://api.cloudinary.com/v1_1/${
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD
+    }/${type === "video" ? "video" : "image"}/upload`;
+
+    xhr.open("POST", endpoint);
+    xhr.send(form);
   });
-}
+};
