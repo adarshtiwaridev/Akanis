@@ -22,19 +22,36 @@ const WorksPage = () => {
         fetchWorks();
     }, []);
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+if (loading)
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-white">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-200 border-t-amber-600" />
+      <p className="text-sm tracking-wide font-medium text-gray-600">
+        Loading content…
+      </p>
+    </div>
+  );
 
     return (
         <main className="min-h-screen p-6 md:p-12 lg:p-20">
             {/* Header Section */}
-            <header className="mb-16">
-                <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-outline opacity-50 mb-2">
-                    Portfolio
-                </h1>
-               <span className="text-[11px] uppercase tracking-[0.35em] font-semibold text-accent">
-      Portfolio
-    </span>
-            </header>
+           <header className="mb-20 ">
+  {/* Background / Outline Title */}
+  <h1 className="text-[2.5rem] md:text-[4rem] font-black uppercase tracking-tight text-gray-200 opacity-70 leading-none select-none">
+    Experience
+  </h1>
+
+  {/* Foreground Label */}
+  <span className="mt-4 block text-lg md:text-xl uppercase tracking-[0.4em] font-semibold text-gray-700">
+    Selected Works
+  </span>
+
+  {/* Subtext */}
+  <p className="mt-3 max-w-xl m text-base md:text-lg text-gray-500 font-medium">
+    A curated showcase of the work <span className="text-accent">I’ve built, shipped, and refined.</span>
+  </p>
+</header>
+
 
        {/* Content Grid */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">

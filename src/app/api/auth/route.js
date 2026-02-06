@@ -31,9 +31,10 @@ export async function POST(req) {
 
     // ✅ Create response
     const response = NextResponse.json(
-      { message: "Login successful" },
+      { message: "Login successful", token: token },
       { status: 200 }
     );
+
 
     // ✅ Set HttpOnly cookie
     response.cookies.set({
@@ -45,6 +46,9 @@ export async function POST(req) {
       maxAge: 2 * 60 * 60, // 2 hours (seconds)
       path: "/",
     });
+
+ 
+   
 
     return response;
 

@@ -35,7 +35,12 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
-
+   if (data.token) {
+    localStorage.setItem("auth_token", data.token);
+    console.log("token saved ")
+   }
+   else {    console.log("No token received");
+   }
       toast.success("Welcome back 🚀");
       router.push("/dashboard");
     } catch (err) {

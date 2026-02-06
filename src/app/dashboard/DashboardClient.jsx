@@ -37,6 +37,10 @@ export default function DashboardClient() {
     try {
       const res = await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
       if (!res.ok) throw new Error("Logout failed");
+      if(res.ok){
+        toast.success("Logged out successfully");
+        localStorage.removeItem("auth_token");
+      }
       router.push("/login");
     } catch (err) {
       console.error("Logout error:", err);
@@ -61,7 +65,7 @@ export default function DashboardClient() {
       try {
         const res = await fetch("/api/contact");
         const data = await res.json();
-
+  console.log("Fetched contacts:", data);
         const allowed = [
           "ad-shoot",
           "photo-shoot",
@@ -234,7 +238,7 @@ export default function DashboardClient() {
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Service</th>
-              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Budegt</th>
             </tr>
           </thead>
           <tbody>
@@ -257,15 +261,8 @@ export default function DashboardClient() {
                     {c.service.replace("-", " ")}
                   </td>
                   <td className="px-6 py-4">
-                    {c.isRead ? (
-                      <span className="flex items-center gap-2 text-green-500">
-                        <CheckCircle size={16} /> Reviewed
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2 text-red-500">
-                        <XCircle size={16} /> New
-                      </span>
-                    )}
+                   
+                    {c.location ? `${c.location}` : "—"}
                   </td>
                 </tr>
               ))

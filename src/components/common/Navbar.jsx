@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import Cookies from "js-cookie";
 import {
   Camera,
   Home,
@@ -15,17 +16,10 @@ import {
   User,
   Calendar,
   X,
+  LayoutDashboard,
 } from "lucide-react";
 
-const navItems = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Login", href: "/login", icon: User },  
-  { name: "Gallery", href: "/Gallery", icon: Image },
-  { name: "Contact", href: "/contact", icon: Phone },
-  { name: "Contactform", href: "/contactform", icon: Calendar },
-  { name: "About", href: "/about", icon: User },
-  { name: "Services", href: "/services", icon: Briefcase },
-];
+
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -53,6 +47,17 @@ export default function Navbar() {
 
   if (!mounted) return null;
 
+const token = localStorage.getItem("auth_token");
+console.log("Auth token:", token);
+const navItems = [
+  { name: "Home", href: "/", icon: Home },
+  token ? { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard } : { name: "Login", href: "/login", icon: User },  
+  { name: "Gallery", href: "/Gallery", icon: Image },
+  { name: "Contact", href: "/contact", icon: Phone },
+  { name: "Contactform", href: "/contactform", icon: Calendar },
+  { name: "About", href: "/about", icon: User },
+  { name: "Services", href: "/services", icon: Briefcase },
+];
   return (
     <>
       {/* ================= LOGO (TOP-LEFT) ================= */}
