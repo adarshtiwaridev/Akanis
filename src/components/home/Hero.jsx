@@ -60,32 +60,27 @@ const router = useRouter();
 "/photos/image01.jpg"
  ];
 
-   /* FAST SLIDE ON HOVER */
-  useEffect(() => {
-    let interval;
-    if (isHovered) {
-      interval = setInterval(() => {
-        setSliderIndex((prev) => (prev + 1) % images.length);
-      }, 800);
-    } else {
-      setSliderIndex(0);
-    }
-    return () => clearInterval(interval);
-  }, [isHovered, images.length]);
+ const isMobile = typeof window !== "undefined"
+  ? window.matchMedia("(hover: none)").matches
+  : false;
 
-  // Auto-slide logic when hovered
-  useEffect(() => {
-    let interval;
-    if (isHovered) {
-      interval = setInterval(() => {
-        setSliderIndex((prev) => (prev ) % images.length);
-      }, 500); // Speed of the fast slide
-    } else {
-      setSliderIndex(0);
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isHovered, images.length]);
+
+useEffect(() => {
+  let interval;
+
+  // Mobile → auto slide
+  // Desktop → slide only on hover
+  if (isMobile || isHovered) {
+    interval = setInterval(() => {
+      setSliderIndex((prev) => (prev + 1) % images.length);
+    }, 800);
+  } else {
+    setSliderIndex(0);
+  }
+
+  return () => clearInterval(interval);
+}, [isHovered, images.length, isMobile]);
+
 
   const textVariant = {
     hidden: { opacity: 0, y: 100 },

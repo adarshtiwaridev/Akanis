@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   X,
   CheckCircle,
@@ -52,6 +53,7 @@ export default function DashboardClient() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   /* ================= FETCH CONTACTS ================= */
   useEffect(() => {
@@ -103,6 +105,8 @@ export default function DashboardClient() {
   const handleUpload = async () => {
     if (!file) return;
 
+    setIsUploading(true);
+
     try {
       // POST to our backend which will upload to Cloudinary securely
       const form = new FormData();
@@ -133,6 +137,9 @@ export default function DashboardClient() {
       // prepend new media to UI
       setMedia((prev) => [newItem, ...prev]);
 
+      // Show success toast
+      toast.success(`${modalType} uploaded successfully! 🎉`);
+
       // Reset UI
       setModalType(null);
       setFile(null);
@@ -141,7 +148,9 @@ export default function DashboardClient() {
 
     } catch (err) {
       console.error(err);
-      alert("Upload failed: " + err.message);
+      toast.error("Upload failed: " + err.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -395,9 +404,14 @@ export default function DashboardClient() {
 
             <button
               onClick={handleUpload}
-              className="w-full rounded-xl bg-accent py-3 font-semibold text-white"
+              disabled={isUploading}
+              className={`w-full rounded-xl py-3 font-semibold text-white transition-all
+                ${isUploading 
+                  ? "bg-accent/50 cursor-not-allowed opacity-70" 
+                  : "bg-accent hover:bg-accent/90"
+                }`}
             >
-              Upload
+              {isUploading ? "Uploading..." : "Upload"}
             </button>
           </div>
         </div>

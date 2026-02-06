@@ -104,25 +104,10 @@ const items = [
 
 
 const Gallery = () => {
-  const containerRef = useRef(null);
-
-  // Scroll-based parallax
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-  });
-
-  const ySlow = useTransform(smoothProgress, [0, 1], [0, -100]);
-  const yFast = useTransform(smoothProgress, [0, 1], [0, -250]);
-
+  
   return (
     <section
-      ref={containerRef}
+      
       className="py-24 px-6 bg-background text-foreground transition-colors duration-700"
     >
       <div className="max-w-7xl mx-auto">
@@ -161,7 +146,6 @@ const Gallery = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
-              style={{ y: i % 2 === 0 ? ySlow : yFast }}
               className="group relative flex flex-col cursor-pointer"
             >
               {/* IMAGE */}
