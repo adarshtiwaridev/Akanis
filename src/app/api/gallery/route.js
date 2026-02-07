@@ -1,31 +1,17 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import dbConnect from "../../../lib/dbConnect";
 import Gallery from "../../../models/Gallery";
-import { uploadToCloudinaryServer } from "../../../lib/uploadToCloudinaryServer";
 import { v2 as cloudinary } from "cloudinary";
 
-/* ======================
-   AUTH HELPER
-====================== */
-async function verifyAuth() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
-
-  if (!token) return false;
-
-  try {
-    jwt.verify(token, process.env.JWT_SECRET);
-    return true;
-  } catch {
-    return false;
-  }
-}
+// Cloudinary config (needed for DELETE)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 /* ======================
-   GET  /api/gallery?type=photo|video
-   Public
+   GET  /api/gallery
 ====================== */
 export async function GET(req) {
   await dbConnect();
@@ -41,129 +27,86 @@ export async function GET(req) {
 
 /* ======================
    POST  /api/gallery
-   Protected (JWT)
+   (NO AUTH)
 ====================== */
 export async function POST(req) {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const isAuth = await verifyAuth();
-  if (!isAuth) {
-    return NextResponse.json(
-      { message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+    const body = await req.json();
+    const { title = "", tags = "", type, url, publicId } = body;
 
-  const contentType = req.headers.get("content-type") || "";
-
-  // ---- multipart upload ----
-  if (contentType.includes("multipart/form-data")) {
-    const form = await req.formData();
-
-    const file = form.get("file");
-    const title = form.get("title")?.toString() || "";
-    const tags = form.get("tags")?.toString() || "";
-    const type = form.get("type")?.toString() || "photo";
-
-    if (!file || typeof file.arrayBuffer !== "function") {
+    if (!type || !url || !publicId) {
       return NextResponse.json(
-        { message: "Invalid file upload" },
+        { message: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // optional limit (adjust as needed)
-    const MAX_BYTES = 250 * 1024 * 1024; // 250 MB
-    if (file.size && file.size > MAX_BYTES) {
-      return NextResponse.json({ message: "File too large" }, { status: 413 });
-    }
-
-    // ensure server Cloudinary creds present
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-      console.error("Missing Cloudinary server env vars");
-      return NextResponse.json({ message: "Server misconfigured: Cloudinary credentials missing" }, { status: 500 });
-    }
-
-    let uploadRes;
-    try {
-      uploadRes = await uploadToCloudinaryServer(file, {
-        resourceType: type === "video" ? "video" : "image",
-      });
-    } catch (err) {
-      console.error("Cloudinary upload error:", err);
-      return NextResponse.json({ message: err?.message || "Cloudinary upload failed" }, { status: 500 });
-    }
+    const normalizedTags = Array.isArray(tags)
+      ? tags
+      : typeof tags === "string"
+      ? tags.split(",").map(t => t.trim())
+      : [];
 
     const media = await Gallery.create({
       title,
-      tags,
+      tags: normalizedTags,
       type,
-      url: uploadRes.secure_url,
-      publicId: uploadRes.public_id,
+      url,
+      publicId,
     });
 
     return NextResponse.json(media, { status: 201 });
-  }
 
-  // ---- JSON fallback ----
-  const { title, tags, type, url, publicId } = await req.json();
-
-  if (!url || !type) {
+  } catch (err) {
+    console.error("POST /api/gallery error:", err);
     return NextResponse.json(
-      { message: "Missing data" },
-      { status: 400 }
+      { message: "Server error" },
+      { status: 500 }
     );
   }
-
-  const media = await Gallery.create({
-    title,
-    tags,
-    type,
-    url,
-    publicId,
-  });
-
-  return NextResponse.json(media, { status: 201 });
 }
 
 /* ======================
    DELETE  /api/gallery?id=MEDIA_ID
-   Protected (JWT)
+   (NO AUTH)
 ====================== */
 export async function DELETE(req) {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const isAuth = await verifyAuth();
-  if (!isAuth) {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Media ID required" },
+        { status: 400 }
+      );
+    }
+
+    const media = await Gallery.findById(id);
+    if (!media) {
+      return NextResponse.json(
+        { message: "Media not found" },
+        { status: 404 }
+      );
+    }
+
+    await cloudinary.uploader.destroy(media.publicId, {
+      resource_type: media.type === "video" ? "video" : "image",
+    });
+
+    await media.deleteOne();
+
+    return NextResponse.json({ success: true }, { status: 200 });
+
+  } catch (err) {
+    console.error("DELETE /api/gallery error:", err);
     return NextResponse.json(
-      { message: "Unauthorized" },
-      { status: 401 }
+      { message: "Server error" },
+      { status: 500 }
     );
   }
-
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
-  if (!id) {
-    return NextResponse.json(
-      { message: "Media ID required" },
-      { status: 400 }
-    );
-  }
-
-  const media = await Gallery.findById(id);
-  if (!media) {
-    return NextResponse.json(
-      { message: "Media not found" },
-      { status: 404 }
-    );
-  }
-
-  await cloudinary.uploader.destroy(media.publicId, {
-    resource_type: media.type === "video" ? "video" : "image",
-  });
-
-  await media.deleteOne();
-
-  return NextResponse.json({ success: true }, { status: 200 });
 }

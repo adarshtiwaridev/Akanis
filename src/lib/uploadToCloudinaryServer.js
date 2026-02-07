@@ -6,26 +6,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function uploadToCloudinaryServer(
-  file,
-  { folder = "studio-gallery", resourceType = "auto", quality, height } = {}
-) {
-  const buffer = Buffer.from(await file.arrayBuffer());
+export async function POST() {
+  const timestamp = Math.floor(Date.now() / 1000);
 
-  return await new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder,
-          resource_type: resourceType,
-          quality,
-          height,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      )
-      .end(buffer);
+  const signature = cloudinary.utils.api_sign_request(
+    {
+      folder: "studio-gallery",
+      timestamp,
+    },
+    process.env.CLOUDINARY_API_SECRET
+  );
+
+  return Response.json({
+    timestamp,
+    signature,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
   });
 }

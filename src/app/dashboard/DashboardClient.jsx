@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
 import {
   X,
   CheckCircle,
@@ -105,58 +106,126 @@ export default function DashboardClient() {
     return contacts.slice(start, start + ITEMS_PER_PAGE);
   }, [contacts, page]);
 
-  /* ================= UPLOAD ================= */
-  const handleUpload = async () => {
-    if (!file) return;
+/* ================= UPLOAD ================= */
 
-    setIsUploading(true);
+const handleUpload = async () => {
+  if (!file) return;
 
-    try {
-      // POST to our backend which will upload to Cloudinary securely
-      const form = new FormData();
-      form.append("file", file);
-      form.append("title", title);
-      form.append("tags", tags);
-      form.append("type", modalType);
+  setIsUploading(true);
 
-      const res = await fetch("/api/gallery", {
+  try {
+    let uploadFile = file;
+    const resourceType = modalType === "video" ? "video" : "image";
+
+    /* 🔹 Optional compression */
+    if (modalType === "video" && file.size > 50 * 1024 * 1024) {
+      toast("Compressing video… ⏳");
+      const { compressVideoNative } = await import(
+        "../../utils/compressVideo.client"
+      );
+      uploadFile = await compressVideoNative(file);
+    }
+
+    let cloudData;
+
+    /* 🔹 Large files → proxy */
+    if (uploadFile.size > 50 * 1024 * 1024) {
+      const proxyForm = new FormData();
+      proxyForm.append("file", uploadFile);
+      proxyForm.append("folder", "studio-gallery");
+      proxyForm.append("resource_type", resourceType);
+
+      const proxyRes = await fetch("/api/upload/proxy", {
         method: "POST",
-        body: form,
-        credentials: "same-origin",
+        body: proxyForm,
       });
 
-      // redirect to login on auth failure
-      if (res.status === 401) {
-        router.push("/login");
-        return;
+      if (!proxyRes.ok) {
+        const err = await proxyRes.json().catch(() => ({}));
+        throw new Error(err?.message || "Proxy upload failed");
       }
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err?.message || "Upload failed");
-      }
-
-      const newItem = await res.json();
-
-      // prepend new media to UI
-      setMedia((prev) => [newItem, ...prev]);
-
-      // Show success toast
-      toast.success(`${modalType} uploaded successfully! 🎉`);
-
-      // Reset UI
-      setModalType(null);
-      setFile(null);
-      setTitle("");
-      setTags("");
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Upload failed: " + err.message);
-    } finally {
-      setIsUploading(false);
+      cloudData = await proxyRes.json();
     }
-  };
+
+    /* 🔹 Normal signed upload */
+    else {
+      const signRes = await fetch("/api/cloudinary-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resourceType }),
+      });
+
+      const sign = await signRes.json();
+
+      const cloudForm = new FormData();
+      cloudForm.append("file", uploadFile);
+      cloudForm.append("api_key", sign.apiKey);
+      cloudForm.append("timestamp", sign.timestamp);
+      cloudForm.append("signature", sign.signature);
+      cloudForm.append("folder", "studio-gallery");
+
+      const cloudRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${sign.cloudName}/${resourceType}/upload`,
+        {
+          method: "POST",
+          body: cloudForm,
+        }
+      );
+
+      if (!cloudRes.ok) {
+        const err = await cloudRes.json().catch(() => ({}));
+        throw new Error(err.error?.message || "Cloudinary upload failed");
+      }
+
+      cloudData = await cloudRes.json();
+    }
+
+    /* 🔹 Save to DB */
+    const galleryRes = await fetch("/api/gallery", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        tags,
+        type: modalType,
+        url: cloudData.secure_url,
+        publicId: cloudData.public_id,
+      }),
+    });
+
+    if (!galleryRes.ok) {
+      const err = await galleryRes.json().catch(() => ({}));
+      throw new Error(err?.message || "Gallery save failed");
+    }
+
+    toast.success("Media uploaded successfully 🚀");
+
+    setMedia((prev) => [
+      {
+        _id: Date.now(),
+        title,
+        tags: tags.split(","),
+        type: modalType,
+        url: cloudData.secure_url,
+      },
+      ...prev,
+    ]);
+
+    setModalType(null);
+    setFile(null);
+    setTitle("");
+    setTags("");
+  } catch (err) {
+    console.error(err);
+    toast.error(err.message);
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+
+
 
   /* ================= DELETE MEDIA ================= */
   const handleDeleteMedia = async (id) => {
@@ -238,7 +307,8 @@ export default function DashboardClient() {
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Service</th>
-              <th className="px-6 py-4">Budegt</th>
+              <th className="px-6 py-4">Location</th>
+              <th className="px-6 py-4">Budget</th>
             </tr>
           </thead>
           <tbody>
@@ -263,6 +333,9 @@ export default function DashboardClient() {
                   <td className="px-6 py-4">
                    
                     {c.location ? `${c.location}` : "—"}
+                  </td>
+                  <td className="px-6 py-4">
+                    {c.budget}
                   </td>
                 </tr>
               ))
