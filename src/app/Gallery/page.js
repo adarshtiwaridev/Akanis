@@ -12,7 +12,7 @@ const items = [
     title: "Brand Launch Film",
     category: "Videography",
     type: "video",
-    src: "/photos/mountain.jpg",
+    src: "/photos/banner.avif",
     details: {
       platform: "YouTube / Instagram",
       duration: "60 sec",
@@ -24,7 +24,7 @@ const items = [
     title: "Cinematic Product Reel",
     category: "Video Reel",
     type: "video",
-    src: "/photos/reel.jpg",
+    src: "/photos/software.avif",
     details: {
       platform: "Instagram Reels",
       duration: "30 sec",
@@ -36,7 +36,7 @@ const items = [
     title: "Social Media Ad Reel",
     category: "Brand Ads",
     type: "video",
-    src: "/photos/netflix.jpg",
+    src: "/photos/web.avif",
     details: {
       platform: "Instagram / Facebook",
       duration: "20 sec",
@@ -78,7 +78,7 @@ const items = [
     title: "Mobile App Interface",
     category: "App Development",
     type: "app",
-    src: "/photos/mobile-app.jpg",
+    src: "/photos/mobile.avif",
     details: {
       tech: "React Native",
       features: "Auth • API • Notifications",
@@ -93,7 +93,7 @@ const items = [
     title: "Corporate Brand Film",
     category: "Video Production",
     type: "video",
-    src: "/photos/brand.jpg",
+    src: "/photos/banner.avif",
     details: {
       platform: "Website / YouTube",
       duration: "90 sec",

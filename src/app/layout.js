@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-screen flex flex-col">
         <Navbar />
-       <Toaster richColors position="top-right" />
+       <Toaster richColors position="top-right" toastOptions={{ duration:3000 }} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

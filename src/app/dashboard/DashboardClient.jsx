@@ -109,7 +109,15 @@ export default function DashboardClient() {
 /* ================= UPLOAD ================= */
 
 const handleUpload = async () => {
-  if (!file) return;
+  if (!file) {
+    toast.error("Please select a file");
+    return;
+  }
+
+  if (!title.trim()) {
+    toast.error("Please enter a title");
+    return;
+  }
 
   setIsUploading(true);
 
@@ -117,7 +125,34 @@ const handleUpload = async () => {
     let uploadFile = file;
     const resourceType = modalType === "video" ? "video" : "image";
 
-    /* 🔹 Optional compression */
+    // Validate file type
+    const validImageTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+    const validVideoTypes = ["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo"];
+    const validTypes = resourceType === "image" ? validImageTypes : validVideoTypes;
+
+    if (!validTypes.includes(file.type)) {
+      toast.error(`Invalid ${resourceType} format. Supported: ${validTypes.join(", ")}`);
+      setIsUploading(false);
+      return;
+    }
+
+    // Check size limits
+    const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024; // 50MB for images
+    const VIDEO_SIZE_LIMIT = 500 * 1024 * 1024; // 500MB for videos
+    
+    if (resourceType === "image" && file.size > IMAGE_SIZE_LIMIT) {
+      toast.error(`Image too large. Max ${IMAGE_SIZE_LIMIT / (1024 * 1024)}MB. Received: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
+      setIsUploading(false);
+      return;
+    }
+
+    if (resourceType === "video" && file.size > VIDEO_SIZE_LIMIT) {
+      toast.error(`Video too large. Max ${VIDEO_SIZE_LIMIT / (1024 * 1024)}MB. Received: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
+      setIsUploading(false);
+      return;
+    }
+
+    /* 🔹 Optional compression for large videos */
     if (modalType === "video" && file.size > 50 * 1024 * 1024) {
       toast("Compressing video… ⏳");
       const { compressVideoNative } = await import(
@@ -130,55 +165,89 @@ const handleUpload = async () => {
 
     /* 🔹 Large files → proxy */
     if (uploadFile.size > 50 * 1024 * 1024) {
+      console.log("Using proxy upload for large file:", uploadFile.name);
+      const toastId = toast("Uploading large file…", { duration: 999999 });
+      
       const proxyForm = new FormData();
       proxyForm.append("file", uploadFile);
       proxyForm.append("folder", "studio-gallery");
       proxyForm.append("resource_type", resourceType);
 
-      const proxyRes = await fetch("/api/upload/proxy", {
-        method: "POST",
-        body: proxyForm,
-      });
+      try {
+        const proxyRes = await fetch("/api/upload/proxy", {
+          method: "POST",
+          body: proxyForm,
+        });
 
-      if (!proxyRes.ok) {
-        const err = await proxyRes.json().catch(() => ({}));
-        throw new Error(err?.message || "Proxy upload failed");
+        if (!proxyRes.ok) {
+          const err = await proxyRes.json().catch(() => ({ message: "Upload failed" }));
+          console.error("[CLIENT] Proxy upload failed:", err);
+          toast.error(err?.message || "Proxy upload failed", { id: toastId });
+          throw new Error(err?.message || "Proxy upload failed");
+        }
+
+        cloudData = await proxyRes.json();
+        console.log("Proxy upload success:", cloudData);
+        toast.success("Upload completed", { id: toastId });
+      } catch (err) {
+        toast.error(err?.message || "Upload failed", { id: toastId });
+        throw err;
       }
-
-      cloudData = await proxyRes.json();
     }
 
     /* 🔹 Normal signed upload */
     else {
-      const signRes = await fetch("/api/cloudinary-signature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resourceType }),
-      });
-
-      const sign = await signRes.json();
-
-      const cloudForm = new FormData();
-      cloudForm.append("file", uploadFile);
-      cloudForm.append("api_key", sign.apiKey);
-      cloudForm.append("timestamp", sign.timestamp);
-      cloudForm.append("signature", sign.signature);
-      cloudForm.append("folder", "studio-gallery");
-
-      const cloudRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${sign.cloudName}/${resourceType}/upload`,
-        {
+      console.log("Using direct Cloudinary upload");
+      const toastId = toast(`Uploading ${resourceType}…`, { duration: 999999 });
+      
+      try {
+        const signRes = await fetch("/api/cloudinary-signature", {
           method: "POST",
-          body: cloudForm,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resourceType }),
+        });
+
+        if (!signRes.ok) {
+          toast.error("Failed to get signature", { id: toastId });
+          throw new Error("Failed to get signature");
         }
-      );
 
-      if (!cloudRes.ok) {
-        const err = await cloudRes.json().catch(() => ({}));
-        throw new Error(err.error?.message || "Cloudinary upload failed");
+        const sign = await signRes.json();
+        console.log("Signature received:", { timestamp: sign.timestamp, cloudName: sign.cloudName });
+
+        const cloudForm = new FormData();
+        cloudForm.append("file", uploadFile);
+        cloudForm.append("api_key", sign.apiKey);
+        cloudForm.append("timestamp", sign.timestamp);
+        cloudForm.append("signature", sign.signature);
+        cloudForm.append("folder", "studio-gallery");
+
+        const cloudRes = await fetch(
+          `https://api.cloudinary.com/v1_1/${sign.cloudName}/${resourceType}/upload`,
+          {
+            method: "POST",
+            body: cloudForm,
+          }
+        );
+
+        if (!cloudRes.ok) {
+          const err = await cloudRes.json().catch(() => ({}));
+          console.error("[CLIENT] Cloudinary upload failed:", err);
+          toast.error(err.error?.message || `Cloudinary ${resourceType} upload failed`, { id: toastId });
+          throw new Error(err.error?.message || `Cloudinary ${resourceType} upload failed`);
+        }
+
+        cloudData = await cloudRes.json();
+        console.log("Cloudinary upload success:", cloudData);
+        toast.success("Upload completed", { id: toastId });
+      } catch (sigErr) {
+        console.error("[CLIENT] Signature/Upload error:", sigErr);
+        throw sigErr;
       }
+    }
 
-      cloudData = await cloudRes.json();
+    if (!cloudData?.secure_url || !cloudData?.public_id) {
+      throw new Error("Invalid response from upload service");
     }
 
     /* 🔹 Save to DB */
@@ -196,29 +265,24 @@ const handleUpload = async () => {
 
     if (!galleryRes.ok) {
       const err = await galleryRes.json().catch(() => ({}));
-      throw new Error(err?.message || "Gallery save failed");
+      throw new Error(err?.message || "Failed to save to database");
     }
 
-    toast.success("Media uploaded successfully 🚀");
+    const savedMedia = await galleryRes.json();
+    console.log("Media saved to database:", savedMedia);
 
-    setMedia((prev) => [
-      {
-        _id: Date.now(),
-        title,
-        tags: tags.split(","),
-        type: modalType,
-        url: cloudData.secure_url,
-      },
-      ...prev,
-    ]);
+    toast.success(`${resourceType === "video" ? "Video" : "Image"} uploaded successfully 🚀`);
+
+    setMedia((prev) => [savedMedia, ...prev]);
 
     setModalType(null);
     setFile(null);
     setTitle("");
     setTags("");
   } catch (err) {
-    console.error(err);
-    toast.error(err.message);
+    console.error("[CLIENT] Upload failed:", err);
+    const errorMsg = err?.message || "Upload failed. Please try again.";
+    toast.error(errorMsg);
   } finally {
     setIsUploading(false);
   }
@@ -394,9 +458,15 @@ const handleUpload = async () => {
               className="group relative rounded-xl overflow-hidden border border-border"
             >
               {mediaType === "photo" ? (
-                <img src={item.url} className="h-40 w-full object-contain" />
+                <img src={item.url} alt={item.title} className="h-40 w-full object-cover" />
               ) : (
-                <video src={item.url} className="h-40 w-full object-cover" />
+                <video 
+                  src={item.url} 
+                  className="h-40 w-full object-cover" 
+                  controls
+                  preload="metadata"
+                  muted
+                />
               )}
 
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -448,7 +518,7 @@ const handleUpload = async () => {
             </button>
 
             <h2 className="text-2xl font-bold mb-4">
-              Upload {modalType}
+              Upload {modalType === "photo" ? "Photo" : "Video"}
             </h2>
 
             <input
@@ -456,27 +526,48 @@ const handleUpload = async () => {
               accept={modalType === "photo" ? "image/*" : "video/*"}
               onChange={(e) => setFile(e.target.files[0])}
               className="mb-4 w-full"
+              disabled={isUploading}
             />
+
+            {file && (
+              <div className="mb-4 p-3 rounded-lg bg-foreground/5 border border-border text-sm">
+                <div className="font-medium">📁 {file.name}</div>
+                <div className="text-foreground/60 mt-1">
+                  Size: {(file.size / (1024 * 1024)).toFixed(2)}MB
+                </div>
+                <div className="text-foreground/60">
+                  Type: {file.type || "Unknown"}
+                </div>
+                {modalType === "photo" && file.size > 50 * 1024 * 1024 && (
+                  <div className="text-red-500 mt-2">⚠️ Image exceeds 50MB limit</div>
+                )}
+                {modalType === "video" && file.size > 500 * 1024 * 1024 && (
+                  <div className="text-red-500 mt-2">⚠️ Video exceeds 500MB limit</div>
+                )}
+              </div>
+            )}
 
             <input
               placeholder="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="mb-3 w-full rounded-xl border border-border px-4 py-2"
+              disabled={isUploading}
             />
 
             <input
-              placeholder="Tags"
+              placeholder="Tags (comma-separated)"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className="mb-5 w-full rounded-xl border border-border px-4 py-2"
+              disabled={isUploading}
             />
 
             <button
               onClick={handleUpload}
-              disabled={isUploading}
+              disabled={isUploading || !file}
               className={`w-full rounded-xl py-3 font-semibold text-white transition-all
-                ${isUploading 
+                ${isUploading || !file
                   ? "bg-accent/50 cursor-not-allowed opacity-70" 
                   : "bg-accent hover:bg-accent/90"
                 }`}

@@ -9,33 +9,41 @@ cloudinary.config({
 
 export async function POST(req) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("file");
+    const body = await req.json().catch(() => ({}));
+    const resourceType = body.resourceType || "image";
 
-    if (!file) {
+    // Validate resource type
+    if (!["image", "video"].includes(resourceType)) {
       return NextResponse.json(
-        { error: "No file provided" },
+        { message: "Invalid resource type" },
         { status: 400 }
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const timestamp = Math.floor(Date.now() / 1000);
 
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream({ folder: "uploads" }, (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
-        })
-        .end(buffer);
-    });
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        folder: "studio-gallery",
+        timestamp,
+      },
+      process.env.CLOUDINARY_API_SECRET
+    );
 
-    return NextResponse.json(uploadResult, { status: 200 });
-  } catch (err) {
-    console.error(err);
     return NextResponse.json(
-      { error: "Upload failed" },
+      {
+        timestamp,
+        signature,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        resourceType,
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Signature generation error:", err);
+    return NextResponse.json(
+      { message: "Failed to generate signature" },
       { status: 500 }
     );
   }

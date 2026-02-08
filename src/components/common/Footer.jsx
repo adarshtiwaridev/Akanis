@@ -116,7 +116,7 @@ function LinkItem({ icon, text, href }) {
 function FooterLink({ text }) {
   return (
     <li>
-      <a href="#" className="opacity-50 hover:opacity-100 hover:text-accent transition-all flex items-center gap-2 group">
+      <a href="#text" className="opacity-50 hover:opacity-100 hover:text-accent transition-all flex items-center gap-2 group">
         <span className="h-px w-0 bg-accent group-hover:w-4 transition-all duration-300" />
         {text}
       </a>
