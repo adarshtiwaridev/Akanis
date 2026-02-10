@@ -169,7 +169,7 @@ export default function ContactForm() {
           dark:bg-transparent dark:text-foreground
         "
       >
-        <option value="" disabled className="text-muted-foreground">
+        <option value="" disabled className="text-muted-foreground bg-background">
           Select a service
         </option>
 

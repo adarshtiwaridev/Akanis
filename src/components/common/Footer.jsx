@@ -56,10 +56,10 @@ export default function Footer() {
           <div className="lg:col-span-3 space-y-6">
             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Navigation</h3>
             <ul className="space-y-3 text-sm font-medium">
-              <FooterLink text="Our Work" />
-              <FooterLink text="service" />
-              <FooterLink text="about" />
-              <FooterLink text="contact" />
+              <FooterLink text="Our Work" id="Work" />
+              <FooterLink text="Services" id="Services" />
+              <FooterLink text="About" id="About" />
+              <FooterLink text="Contact" id="Contact" />
             </ul>
           </div>
 
@@ -116,7 +116,7 @@ function LinkItem({ icon, text, href }) {
 function FooterLink({ text }) {
   return (
     <li>
-      <a href="#text" className="opacity-50 hover:opacity-100 hover:text-accent transition-all flex items-center gap-2 group">
+      <a href="/" className="opacity-50 hover:opacity-100 hover:text-accent transition-all flex items-center gap-2 group">
         <span className="h-px w-0 bg-accent group-hover:w-4 transition-all duration-300" />
         {text}
       </a>

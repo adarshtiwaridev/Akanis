@@ -48,7 +48,6 @@ export default function Navbar() {
   if (!mounted) return null;
 
 const token = localStorage.getItem("auth_token");
-console.log("Auth token:", token);
 const navItems = [
   { name: "Home", href: "/", icon: Home },
   token ? { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard } : { name: "Login", href: "/login", icon: User },  
@@ -66,6 +65,7 @@ const navItems = [
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="flex flex-col leading-none text-white"
+           
         >
           <h1 className="text-2xl font-black uppercase tracking-[0.3em]">AKANIS</h1>
           <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">Production</h2>

@@ -166,7 +166,7 @@ const handleUpload = async () => {
     /* 🔹 Large files → proxy */
     if (uploadFile.size > 50 * 1024 * 1024) {
       console.log("Using proxy upload for large file:", uploadFile.name);
-      const toastId = toast("Uploading large file…", { duration: 999999 });
+      const toastId = toast("Uploading large file…", );
       
       const proxyForm = new FormData();
       proxyForm.append("file", uploadFile);
@@ -198,7 +198,7 @@ const handleUpload = async () => {
     /* 🔹 Normal signed upload */
     else {
       console.log("Using direct Cloudinary upload");
-      const toastId = toast(`Uploading ${resourceType}…`, { duration: 999999 });
+      const toastId = toast(`Uploading ${resourceType}…`, { duration: 10000 });
       
       try {
         const signRes = await fetch("/api/cloudinary-signature", {
@@ -239,7 +239,6 @@ const handleUpload = async () => {
 
         cloudData = await cloudRes.json();
         console.log("Cloudinary upload success:", cloudData);
-        toast.success("Upload completed", { id: toastId });
       } catch (sigErr) {
         console.error("[CLIENT] Signature/Upload error:", sigErr);
         throw sigErr;
@@ -458,21 +457,21 @@ const handleUpload = async () => {
               className="group relative rounded-xl overflow-hidden border border-border"
             >
               {mediaType === "photo" ? (
-                <img src={item.url} alt={item.title} className="h-40 w-full object-cover" />
+                <img src={item.url} alt={item.title} className="h-64 w-full object-contain" />
               ) : (
                 <video 
                   src={item.url} 
-                  className="h-40 w-full object-cover" 
+                  className="h-54 w-full object-cover" 
                   controls
                   preload="metadata"
                   muted
                 />
               )}
 
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+              <div className="absolute top-0   bg-black/60 opacity-0 group-hover:opacity-100 items-end justify-center transition">
                 <button
                   onClick={() => handleDeleteMedia(item._id)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white"
+                  className="flex items-center gap-2 px-1 py-1 bg-red-600 text-white"
                 >
                   <Trash2 size={16} /> Delete
                 </button>
