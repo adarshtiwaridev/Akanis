@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -44,7 +45,8 @@ export default function DashboardClient() {
       }
       router.push("/login");
     } catch (err) {
-      console.error("Logout error:", err);
+      // report error to toast and avoid leaking stack to production console
+      toast.error("Logout failed");
       // fallback
       window.location.href = "/login";
     }
@@ -66,7 +68,6 @@ export default function DashboardClient() {
       try {
         const res = await fetch("/api/contact");
         const data = await res.json();
-  console.log("Fetched contacts:", data);
         const allowed = [
           "ad-shoot",
           "photo-shoot",
@@ -165,7 +166,7 @@ const handleUpload = async () => {
 
     /* 🔹 Large files → proxy */
     if (uploadFile.size > 50 * 1024 * 1024) {
-      console.log("Using proxy upload for large file:", uploadFile.name);
+      // large file → proxy flow
       const toastId = toast("Uploading large file…", );
       
       const proxyForm = new FormData();
@@ -181,13 +182,11 @@ const handleUpload = async () => {
 
         if (!proxyRes.ok) {
           const err = await proxyRes.json().catch(() => ({ message: "Upload failed" }));
-          console.error("[CLIENT] Proxy upload failed:", err);
           toast.error(err?.message || "Proxy upload failed", { id: toastId });
           throw new Error(err?.message || "Proxy upload failed");
         }
 
         cloudData = await proxyRes.json();
-        console.log("Proxy upload success:", cloudData);
         toast.success("Upload completed", { id: toastId });
       } catch (err) {
         toast.error(err?.message || "Upload failed", { id: toastId });
@@ -197,7 +196,6 @@ const handleUpload = async () => {
 
     /* 🔹 Normal signed upload */
     else {
-      console.log("Using direct Cloudinary upload");
       const toastId = toast(`Uploading ${resourceType}…`, { duration: 10000 });
       
       try {
@@ -213,7 +211,6 @@ const handleUpload = async () => {
         }
 
         const sign = await signRes.json();
-        console.log("Signature received:", { timestamp: sign.timestamp, cloudName: sign.cloudName });
 
         const cloudForm = new FormData();
         cloudForm.append("file", uploadFile);
@@ -232,15 +229,12 @@ const handleUpload = async () => {
 
         if (!cloudRes.ok) {
           const err = await cloudRes.json().catch(() => ({}));
-          console.error("[CLIENT] Cloudinary upload failed:", err);
           toast.error(err.error?.message || `Cloudinary ${resourceType} upload failed`, { id: toastId });
           throw new Error(err.error?.message || `Cloudinary ${resourceType} upload failed`);
         }
 
         cloudData = await cloudRes.json();
-        console.log("Cloudinary upload success:", cloudData);
       } catch (sigErr) {
-        console.error("[CLIENT] Signature/Upload error:", sigErr);
         throw sigErr;
       }
     }
@@ -268,7 +262,6 @@ const handleUpload = async () => {
     }
 
     const savedMedia = await galleryRes.json();
-    console.log("Media saved to database:", savedMedia);
 
     toast.success(`${resourceType === "video" ? "Video" : "Image"} uploaded successfully 🚀`);
 
@@ -278,11 +271,10 @@ const handleUpload = async () => {
     setFile(null);
     setTitle("");
     setTags("");
-  } catch (err) {
-    console.error("[CLIENT] Upload failed:", err);
-    const errorMsg = err?.message || "Upload failed. Please try again.";
-    toast.error(errorMsg);
-  } finally {
+    } catch (err) {
+      const errorMsg = err?.message || "Upload failed. Please try again.";
+      toast.error(errorMsg);
+    } finally {
     setIsUploading(false);
   }
 };
@@ -316,11 +308,9 @@ const handleUpload = async () => {
 
       {/* ================= FOUNDER SECTION ================= */}
       <div className=" mx-auto mb-14 rounded-3xl border hover:border-b-amber-800 border-border bg-card px-1 py-5 flex flex-col md:flex-row gap-8 items-center">
-        <img
-          src="/photos/image03.avif" // <-- replace with real image
-          alt="Founder"
-          className="h-28 w-28 rounded-full object-cover border border-border"
-        />
+        <div className="relative h-28 w-28 rounded-full overflow-hidden border border-border">
+          <Image src="/photos/image03.avif" alt="Founder" fill sizes="112px" className="object-cover" />
+        </div>
         <div>
           <h2 className="text-2xl font-extrabold">Adarsh Tiwari</h2>
           <p className="text-sm text-foreground/60 mt-1">
@@ -457,15 +447,19 @@ const handleUpload = async () => {
               className="group relative rounded-xl overflow-hidden border border-border"
             >
               {mediaType === "photo" ? (
-                <img src={item.url} alt={item.title} className="h-64 w-full object-contain" />
+                <div className="relative h-64 w-full">
+                  <Image src={item.url} alt={item.title || "Photo"} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain" />
+                </div>
               ) : (
                 <video 
                   src={item.url} 
                   className="h-54 w-full object-cover" 
                   controls
-                  preload="metadata"
+                  preload="none"
                   muted
-                />
+                >
+                  {item.captions && <track kind="captions" src={item.captions} srcLang="en" />}
+                </video>
               )}
 
               <div className="absolute top-0   bg-black/60 opacity-0 group-hover:opacity-100 items-end justify-center transition">
@@ -487,6 +481,7 @@ const handleUpload = async () => {
           <div className="relative w-full max-w-xl bg-card rounded-2xl p-6">
             <button
               onClick={() => setSelectedContact(null)}
+              aria-label="Close contact details"
               className="absolute right-4 top-4"
             >
               <X />
@@ -511,6 +506,7 @@ const handleUpload = async () => {
           <div className="relative w-full max-w-lg bg-card rounded-2xl p-6">
             <button
               onClick={() => setModalType(null)}
+              aria-label="Close upload dialog"
               className="absolute right-4 top-4"
             >
               <X />
@@ -520,13 +516,17 @@ const handleUpload = async () => {
               Upload {modalType === "photo" ? "Photo" : "Video"}
             </h2>
 
-            <input
-              type="file"
-              accept={modalType === "photo" ? "image/*" : "video/*"}
-              onChange={(e) => setFile(e.target.files[0])}
-              className="mb-4 w-full"
-              disabled={isUploading}
-            />
+            <div className="mb-4">
+              <label htmlFor="upload-file" className="text-sm font-medium text-foreground/80 mb-2 block">Select File</label>
+              <input
+                id="upload-file"
+                type="file"
+                accept={modalType === "photo" ? "image/*" : "video/*"}
+                onChange={(e) => setFile(e.target.files[0])}
+                className="w-full"
+                disabled={isUploading}
+              />
+            </div>
 
             {file && (
               <div className="mb-4 p-3 rounded-lg bg-foreground/5 border border-border text-sm">
@@ -546,21 +546,29 @@ const handleUpload = async () => {
               </div>
             )}
 
-            <input
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mb-3 w-full rounded-xl border border-border px-4 py-2"
-              disabled={isUploading}
-            />
+            <div className="mb-3">
+              <label htmlFor="upload-title" className="text-sm font-medium text-foreground/80 mb-2 block">Title</label>
+              <input
+                id="upload-title"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full rounded-xl border border-border px-4 py-2"
+                disabled={isUploading}
+              />
+            </div>
 
-            <input
-              placeholder="Tags (comma-separated)"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="mb-5 w-full rounded-xl border border-border px-4 py-2"
-              disabled={isUploading}
-            />
+            <div className="mb-5">
+              <label htmlFor="upload-tags" className="text-sm font-medium text-foreground/80 mb-2 block">Tags</label>
+              <input
+                id="upload-tags"
+                placeholder="Tags (comma-separated)"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className="w-full rounded-xl border border-border px-4 py-2"
+                disabled={isUploading}
+              />
+            </div>
 
             <button
               onClick={handleUpload}

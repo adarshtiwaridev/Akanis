@@ -26,6 +26,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -35,6 +36,12 @@ export default function Navbar() {
     } else {
       setDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
     }
+    
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+    const handler = (e) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
   useEffect(() => {
@@ -56,6 +63,7 @@ const navItems = [
   { name: "Contactform", href: "/contactform", icon: Calendar },
   { name: "About", href: "/about", icon: User },
   { name: "Services", href: "/services", icon: Briefcase },
+  { name: "Member", href: "/team", icon: User }
 ];
   return (
     <>
@@ -67,8 +75,8 @@ const navItems = [
           className="flex flex-col leading-none text-white"
            
         >
-          <h1 className="text-2xl font-black uppercase tracking-[0.3em]">AKANIS</h1>
-          <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">Production</h2>
+          <div aria-hidden className="text-2xl font-black uppercase tracking-[0.3em]">AKANIS</div>
+          <div aria-hidden className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">Production</div>
         </motion.div>
       </div>
 
@@ -103,6 +111,7 @@ const navItems = [
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              transition={prefersReducedMotion ? { duration: 0 } : undefined}
               className="flex flex-col items-end gap-4 mr-2"
             >
               {navItems.map((item, i) => {
@@ -114,7 +123,7 @@ const navItems = [
                     key={item.name}
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { delay: i * 0.05 }}
                   >
                     <Link href={item.href} className="group flex items-center gap-4">
                       {/* TOOLTIP LABEL */}
@@ -141,7 +150,7 @@ const navItems = [
               <motion.button
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navItems.length * 0.05 }}
+                transition={prefersReducedMotion ? { duration: 0 } : { delay: navItems.length * 0.05 }}
                 onClick={() => setDark(!dark)}
                 className="group flex items-center gap-4"
               >

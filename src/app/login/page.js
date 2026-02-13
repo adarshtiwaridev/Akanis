@@ -37,10 +37,10 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
    if (data.token) {
     localStorage.setItem("auth_token", data.token);
-    console.log("token saved ")
-   }
-   else {    console.log("No token received");
-   }
+    // token saved
+    } else {
+      // no token received
+    }
       toast.success("Welcome back 🚀");
       router.push("/dashboard");
     } catch (err) {
@@ -134,6 +134,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

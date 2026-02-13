@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
@@ -11,6 +11,7 @@ import {
   Briefcase,
   CheckCircle,
   ArrowRight,
+  MessageSquare,
 } from "lucide-react";
 
 const serviceCategories = [
@@ -48,7 +49,7 @@ const initialForm = {
   phone: "",
   email: "",
   service: "",
-  budget: "",
+  budget: 0,
   location: "",
   message: "",
 };
@@ -57,16 +58,38 @@ export default function ContactForm() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [budgetRange, setBudgetRange] = useState({
+    min: 0,
+    max: 0,
+    step: 1000,
+  });
 
-  // ✅ AUTO CLOSE SUCCESS AFTER 10 SECONDS
+  // Dynamic budget range logic
+  useEffect(() => {
+    let range = { min: 0, max: 0, step: 1000 };
+    
+    if (["video-production", "videography", "ad-shoot"].includes(form.service)) {
+      range = { min: 8000, max: 25000, step: 1000 };
+    } else if (form.service === "web-dev") {
+      range = { min: 19999, max: 80000, step: 2000 };
+    } else if (form.service !== "") {
+      // Default range for other services so slider isn't hidden
+      range = { min: 15000, max: 50000, step: 1000 };
+    }
+
+    setBudgetRange(range);
+    // Only update budget if the range actually exists
+    if (range.min > 0) {
+      setForm((prev) => ({ ...prev, budget: range.min }));
+    }
+  }, [form.service]);
+
   useEffect(() => {
     if (!success) return;
-
     const timer = setTimeout(() => {
       setSuccess(false);
       setForm(initialForm);
     }, 10000);
-
     return () => clearTimeout(timer);
   }, [success]);
 
@@ -77,175 +100,161 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.service) return;
-
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error("Submission failed");
-
+      // Mocking API call
+      await new Promise(res => setTimeout(res, 1500));
       setSuccess(true);
     } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
+      alert("Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="flex justify-center items-center py-20 px-4 bg-background transition-colors duration-700">
+    <section className="flex justify-center items-center py-20 px-4 bg-background transition-colors duration-500">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        className="w-full max-w-3xl relative"
+        viewport={{ once: true }}
+        className="w-full max-w-3xl"
       >
-        {/* BADGE */}
-        <div className="absolute -top-4 left-10 z-20 bg-accent text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 shadow-xl">
-          <span className="w-2 h-2 bg-white rounded-full animate-ping" />
-          Available for Projects
-        </div>
-
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-card border border-border/50 shadow-xl backdrop-blur-xl p-8 md:p-12">
+        <div className="rounded-3xl bg-card border border-border shadow-2xl p-8 md:p-12">
           <AnimatePresence mode="wait">
             {!success ? (
               <motion.div
-                key="form"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4 }}
+                key="form-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                {/* HEADER */}
-                <div className="mb-10">
-                  <h2 className="text-4xl font-black uppercase tracking-tighter">
+                <header className="mb-10">
+                  <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground">
                     Start a <span className="text-accent italic">Conversation</span>
                   </h2>
-                  <p className="mt-3 text-muted-foreground text-sm">
-                    Fill the form below and we’ll reach out within 24 hours.
+                  <p className="mt-3 text-muted-foreground font-medium">
+                    Fill the form and we’ll reach out within 24 hours.
                   </p>
-                </div>
+                </header>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <CardInput label="Name" name="name" icon={<User size={16} />} value={form.name} onChange={handleChange} />
-                    <CardInput label="Phone" name="phone" icon={<Phone size={16} />} value={form.phone} onChange={handleChange} />
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <CardInput label="Name" name="name" icon={<User size={18} />} value={form.name} onChange={handleChange} placeholder="John Doe" />
+                    <CardInput label="Phone" name="phone" icon={<Phone size={18} />} value={form.phone} onChange={handleChange} placeholder="+91 ..." />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <CardInput label="Email" name="email" type="email" icon={<Mail size={16} />} value={form.email} onChange={handleChange} />
-                    <CardInput label="Location" name="location" icon={<MapPin size={16} />} value={form.location} onChange={handleChange} />
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <CardInput label="Email" name="email" type="email" icon={<Mail size={18} />} value={form.email} onChange={handleChange} placeholder="hello@example.com" />
+                    <CardInput label="Location" name="location" icon={<MapPin size={18} />} value={form.location} onChange={handleChange} placeholder="City, Country" />
                   </div>
 
-{/* SERVICE SELECT – UI CONSISTENT WITH OTHER INPUTS */}
-<div className="grid md:grid-cols-2 gap-8">
-  <div className="space-y-3 group">
-    <label className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40 group-focus-within:opacity-100 group-focus-within:text-accent transition-all">
-      Service Required
-    </label>
+                  {/* SERVICE SELECT */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/80 ml-1">
+                      Service Required
+                    </label>
+                    <div className="relative group">
+                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors" size={18} />
+                      <select
+                        name="service"
+                        value={form.service}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-background text-foreground border border-border rounded-2xl py-4 pl-12 pr-10 text-sm focus:ring-2 focus:ring-accent outline-none appearance-none transition-all"
+                      >
+                        <option value="">Select a service</option>
+                        {serviceCategories.map((category) => (
+                          <optgroup key={category.label} label={category.label} className="bg-card">
+                            {category.options.map((service) => (
+                              <option key={service.value} value={service.value}>
+                                {service.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                        <ArrowRight size={14} className="rotate-90" />
+                      </div>
+                    </div>
+                  </div>
 
-    <div className="relative">
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 group-focus-within:text-accent transition-all">
-        <Briefcase size={16} />
-      </span>
+                  {/* BUDGET SLIDER */}
+                  <AnimatePresence>
+                    {budgetRange.min > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-4 overflow-hidden"
+                      >
+                        <label className="text-[10px] uppercase tracking-widest font-bold  dark:text-white  flex items-center gap-2 ml-1">
+                          <Wallet size={14} />
+                          Estimated Budget
+                        </label>
+                        <div className="px-2">
+                          <input
+                            type="range"
+                            min={budgetRange.min}
+                            max={budgetRange.max}
+                            step={budgetRange.step}
+                            value={form.budget}
+                            onChange={(e) => setForm({ ...form, budget: Number(e.target.value) })}
+                            className="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                          />
+                          <div className="flex justify-between mt-3">
+                            <span className="text-xs font-medium text-muted-foreground">₹{budgetRange.min.toLocaleString()}</span>
+                            <span className="text-sm font-black text-accent bg-accent/10 px-3 py-1 rounded-full">₹{form.budget.toLocaleString()}</span>
+                            <span className="text-xs font-medium text-muted-foreground">₹{budgetRange.max.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-      <select
-        name="service"
-        value={form.service}
-        onChange={handleChange}
-        required
-        className="
-          w-full bg-transparent
-          border-b border-border
-          py-3 pl-8 pr-6
-          text-sm text-foreground
-          outline-none appearance-none
-          focus:border-accent transition-all
-          dark:bg-transparent dark:text-foreground
-        "
-      >
-        <option value="" disabled className="text-muted-foreground bg-background">
-          Select a service
-        </option>
-
-        {serviceCategories.map((category) => (
-          <optgroup key={category.label} label={category.label}>
-            {category.options.map((service) => (
-              <option
-                key={service.value}
-                value={service.value}
-                className="bg-background text-foreground"
-              >
-                {service.name}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-
-      {/* dropdown arrow */}
-      <span className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-        ▾
-      </span>
-    </div>
-  </div>
-
-  <CardInput
-    label="Estimated Budget"
-    name="budget"
-    icon={<Wallet size={16} />}
-    value={form.budget}
-    onChange={handleChange}
-  />
-</div>
-
-              
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black opacity-40">
+                  {/* MESSAGE */}
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/80 ml-1">
                       Project Summary
                     </label>
                     <textarea
+                      id="message"
                       name="message"
-                      rows={3}
+                      rows={4}
                       value={form.message}
                       onChange={handleChange}
                       required
-                      className="w-full bg-transparent border-b border-border py-3 focus:border-accent outline-none resize-none text-sm"
-                      placeholder="What are we building together?"
+                      placeholder="Tell us about your vision..."
+                      className="w-full bg-background text-foreground border border-border rounded-2xl py-4 px-5 text-sm placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-accent outline-none resize-none transition-all"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-16 rounded-2xl bg-foreground text-background font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition active:scale-95 disabled:opacity-50"
+                    className="w-full h-16 rounded-2xl bg-foreground text-background font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:opacity-90 transition active:scale-[0.98] disabled:opacity-50"
                   >
-                    {loading ? "Sending..." : "Submit Inquiry"}
-                    <ArrowRight size={16} />
+                    {loading ? "Processing..." : "Submit Inquiry"}
+                    {!loading && <ArrowRight size={18} />}
                   </button>
                 </form>
               </motion.div>
             ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="py-12 text-center space-y-6"
+              <motion.div 
+                key="success-message"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="py-20 text-center space-y-6"
               >
-                <div className="w-20 h-20 mx-auto rounded-full bg-green-500/10 text-green-500 flex items-center justify-center">
-                  <CheckCircle size={40} />
+                <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle size={40} className="text-accent" />
                 </div>
-                <h2 className="text-3xl font-black uppercase tracking-tight">
-                  Transmission Successful
+                <h2 className="text-4xl font-black text-foreground uppercase tracking-tight">
+                  Received!
                 </h2>
-                <p className="text-muted-foreground">
-                  We’ll be in touch shortly Within 2 hours .
+                <p className="text-muted-foreground max-w-xs mx-auto">
+                  Our team is reviewing your inquiry. We'll be in touch within 2 hours.
                 </p>
               </motion.div>
             )}
@@ -257,18 +266,19 @@ export default function ContactForm() {
 }
 
 const CardInput = memo(({ label, icon, ...props }) => (
-  <div className="space-y-3 group">
-    <label className="text-[10px] uppercase tracking-widest font-black opacity-40">
+  <div className="space-y-2">
+    <label htmlFor={props.name} className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/80 ml-1">
       {label}
     </label>
-    <div className="relative">
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 opacity-40">
+    <div className="relative group">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors">
         {icon}
       </span>
       <input
         {...props}
+        id={props.name}
         required
-        className="w-full bg-transparent border-b border-border py-3 pl-8 text-sm focus:border-accent outline-none"
+        className="w-full bg-background text-foreground border border-border rounded-2xl py-4 pl-12 pr-4 text-sm placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-accent outline-none transition-all"
       />
     </div>
   </div>

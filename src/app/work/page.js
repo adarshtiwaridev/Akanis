@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import Image from "next/image";
 
 /* ================= VIDEO CARD ================= */
 function VideoCard({ item }) {
@@ -14,17 +15,29 @@ function VideoCard({ item }) {
     setIsMuted((prev) => !prev);
   };
 
+  const playOnEnter = () => {
+    if (!videoRef.current) return;
+    videoRef.current.play().catch(() => {});
+  };
+
+  const pauseOnLeave = () => {
+    if (!videoRef.current) return;
+    videoRef.current.pause();
+  };
+
   return (
-    <div className="relative h-full w-full group overflow-hidden">
+    <div className="relative h-full w-full group overflow-hidden" onMouseEnter={playOnEnter} onMouseLeave={pauseOnLeave}>
       <video
         ref={videoRef}
         src={item.url}
-        autoPlay
         muted={isMuted}
         loop
         playsInline
+        preload="none"
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-      />
+      >
+        {item.captions && <track kind="captions" src={item.captions} srcLang="en" />}
+      </video>
 
       <button
         onClick={toggleMute}
@@ -48,7 +61,7 @@ const WorksPage = () => {
         const data = await res.json();
         setWorks(data);
       } catch (err) {
-        console.error("Error fetching works:", err);
+        if (process.env.NODE_ENV === 'development') console.error("Error fetching works:", err);
       } finally {
         setLoading(false);
       }
@@ -97,11 +110,9 @@ const WorksPage = () => {
               {item.type === "video" ? (
                 <VideoCard item={item} />
               ) : (
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                <div className="relative h-full w-full">
+                  <Image src={item.url} alt={item.title || "Work image"} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                </div>
               )}
 
               {/* Overlay */}

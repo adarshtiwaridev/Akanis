@@ -39,8 +39,10 @@ async function parseFormData(req) {
 
 export async function POST(req) {
   try {
-    console.log("[PROXY] POST request received");
-    console.log("[PROXY] Content-Type:", req.headers?.get?.("content-type") || "(unknown)");
+    if (process.env.NODE_ENV === "development") {
+      console.log("[PROXY] POST request received");
+      console.log("[PROXY] Content-Type:", req.headers?.get?.("content-type") || "(unknown)");
+    }
 
     // Parse form data — support Web Request (App Router) and Node IncomingMessage
     let fields = {};
@@ -80,8 +82,10 @@ export async function POST(req) {
       files = parsed.files || {};
     }
 
-    console.log("[PROXY] Raw files object:", JSON.stringify(Object.keys(files)));
-    console.log("[PROXY] Raw fields object:", JSON.stringify(Object.keys(fields)));
+    if (process.env.NODE_ENV === "development") {
+      console.log("[PROXY] Raw files object:", JSON.stringify(Object.keys(files)));
+      console.log("[PROXY] Raw fields object:", JSON.stringify(Object.keys(fields)));
+    }
 
     // Extract file (formidable v3 returns array)
     let file = files.file;
@@ -103,14 +107,16 @@ export async function POST(req) {
     const folder = folderValue || "studio-gallery";
     const resourceType = resourceTypeValue || "video";
 
-    console.log("[PROXY] Parsed data:", { 
+    if (process.env.NODE_ENV === "development") {
+      console.log("[PROXY] Parsed data:", { 
       folder, 
       resourceType, 
       fileName: file?.originalFilename, 
       fileSize: file?.size, 
       fileMime: file?.mimetype,
       filePath: file?.filepath
-    });
+      });
+    }
 
     if (!file) {
       console.error("[PROXY] No file found in request. Available files:", Object.keys(files));
@@ -123,7 +129,7 @@ export async function POST(req) {
     // Validate file exists
     try {
       await fs.access(file.filepath);
-      console.log("[PROXY] ✅ File exists at:", file.filepath);
+      if (process.env.NODE_ENV === "development") console.log("[PROXY] ✅ File exists at:", file.filepath);
     } catch (err) {
       console.error("[PROXY] ❌ File not found at path:", file.filepath);
       return NextResponse.json(
@@ -140,7 +146,7 @@ export async function POST(req) {
     const fileMimeType = file.mimetype || "";
     const isValidType = validTypes.includes(fileMimeType);
     
-    console.log(`[PROXY] Type validation: mimeType=${fileMimeType}, isValid=${isValidType}, validTypes=${validTypes.join(", ")}`);
+    if (process.env.NODE_ENV === "development") console.log(`[PROXY] Type validation: mimeType=${fileMimeType}, isValid=${isValidType}, validTypes=${validTypes.join(", ")}`);
 
     if (!isValidType) {
       console.error(`[PROXY] Invalid file type: ${fileMimeType}`);
@@ -187,7 +193,7 @@ export async function POST(req) {
       fetch_format: "auto",
     };
 
-    console.log(`[PROXY] Starting ${resourceType} upload to Cloudinary...`, { uploadOptions, fileSize: `${(file.size / (1024 * 1024)).toFixed(2)}MB` });
+    if (process.env.NODE_ENV === "development") console.log(`[PROXY] Starting ${resourceType} upload to Cloudinary...`, { uploadOptions, fileSize: `${(file.size / (1024 * 1024)).toFixed(2)}MB` });
 
     try {
       const result = await cloudinary.uploader.upload_large(
@@ -195,11 +201,13 @@ export async function POST(req) {
         uploadOptions
       );
 
-      console.log(`[PROXY] ✅ ${resourceType} uploaded. Raw result:`, Object.keys(result));
-      try {
-        console.log("[PROXY] Cloudinary result preview:", JSON.stringify(result).slice(0, 1000));
-      } catch (e) {
-        // ignore circular
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[PROXY] ✅ ${resourceType} uploaded. Raw result:`, Object.keys(result));
+        try {
+          console.log("[PROXY] Cloudinary result preview:", JSON.stringify(result).slice(0, 1000));
+        } catch (e) {
+          // ignore circular
+        }
       }
 
       // Ensure expected fields exist
@@ -209,7 +217,7 @@ export async function POST(req) {
       if (!publicId || !secureUrl) {
         console.warn("[PROXY] Cloudinary response missing expected fields", { publicId, secureUrl });
       } else {
-        console.log(`[PROXY] Parsed Cloudinary publicId=${publicId}`);
+        if (process.env.NODE_ENV === "development") console.log(`[PROXY] Parsed Cloudinary publicId=${publicId}`);
       }
 
       // Robust cleanup for Windows: attempt rm with retries to avoid EPERM
@@ -219,10 +227,10 @@ export async function POST(req) {
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
           try {
             await fs.rm(p, { force: true });
-            console.log(`[PROXY] Temp file removed: ${p}`);
+            if (process.env.NODE_ENV === "development") console.log(`[PROXY] Temp file removed: ${p}`);
             return;
           } catch (e) {
-            console.warn(`[PROXY] Attempt ${attempt} to remove temp file failed:`, e.code || e.message);
+            if (process.env.NODE_ENV === "development") console.warn(`[PROXY] Attempt ${attempt} to remove temp file failed:`, e.code || e.message);
             // small backoff
             await delay(attempt * 150);
           }
@@ -233,12 +241,12 @@ export async function POST(req) {
       try {
         await tryUnlink(file.filepath);
       } catch (e) {
-        console.warn('[PROXY] Cleanup threw unexpected error:', e?.message || e);
+        if (process.env.NODE_ENV === "development") console.warn('[PROXY] Cleanup threw unexpected error:', e?.message || e);
       }
 
       return NextResponse.json(result, { status: 200 });
-    } catch (cloudinaryErr) {
-      console.error("[PROXY] ❌ Cloudinary upload error:", cloudinaryErr.message || cloudinaryErr);
+      } catch (cloudinaryErr) {
+        if (process.env.NODE_ENV === "development") console.error("[PROXY] ❌ Cloudinary upload error:", cloudinaryErr.message || cloudinaryErr);
       // Cleanup temp file even on error (retry)
       try {
         await fs.rm(file.filepath, { force: true }).catch(() => {});
@@ -252,8 +260,8 @@ export async function POST(req) {
         { status: 500 }
       );
     }
-  } catch (err) {
-    console.error("[PROXY] ❌ Proxy upload error:", err.message || err);
+      } catch (err) {
+    if (process.env.NODE_ENV === "development") console.error("[PROXY] ❌ Proxy upload error:", err.message || err);
     return NextResponse.json(
       {
         message: "Upload failed",

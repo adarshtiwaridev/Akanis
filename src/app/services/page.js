@@ -10,7 +10,7 @@ import {
   Globe,
   Video,
   BarChart3,
-
+  Heart,
   Smartphone,
   Megaphone,
   X,
@@ -21,6 +21,26 @@ import {
 
 const services = [
   // ===== TOP: VIDEO & VISUAL PRODUCTION =====
+
+  {
+  id: "wedding",
+  category: "Production",
+  title: "Wedding Photography & Films",
+  icon: <Heart size={24} />,
+  image: "/photos/wedding.jpg", // replace with your actual wedding image
+  description:
+    "Elegant wedding photography and cinematic films that capture emotions, rituals, and timeless memories.",
+  details: [
+    "Pre-Wedding Shoots",
+    "Candid Photography",
+    "Cinematic Wedding Films",
+    "Traditional Coverage",
+    "Highlight Reels & Teasers",
+  ],
+  size: "md:col-span-2",
+  priority: 3.5, // place between videography and social if needed
+},
+
   {
     id: "ads",
     category: "Production",

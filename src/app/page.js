@@ -1,10 +1,13 @@
  
+"use client";
+
 import Hero from "../components/home/Hero";
-import AboutPage from "./about/page";
-import ContactForm from "./contactform/page"; 
-import Gallery from "./Gallery/page";
-import ServicesPage from "./services/page";
-import WorksPage from "./work/page";
+import dynamic from "next/dynamic";
+
+const WorksPage = dynamic(() => import("./work/page"));
+const ServicesPage = dynamic(() => import("./services/page"));
+const Gallery = dynamic(() => import("./Gallery/page"));
+const ContactForm = dynamic(() => import("./contactform/page"));
 export default function HomePage() {
   return (
     <section>
