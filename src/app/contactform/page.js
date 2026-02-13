@@ -133,29 +133,29 @@ export default function ContactForm() {
                   <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground">
                     Start a <span className="text-accent italic">Conversation</span>
                   </h2>
-                  <p className="mt-3 text-muted-foreground font-medium">
+                  <p className="mt-3 text-foreground font-medium">
                     Fill the form and we’ll reach out within 24 hours.
                   </p>
                 </header>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+                <form onSubmit={handleSubmit} className="space-y-6 ">
+                  <div className="grid md:grid-cols-2 gap-6 text-foreground">
                     <CardInput label="Name" name="name" icon={<User size={18} />} value={form.name} onChange={handleChange} placeholder="John Doe" />
                     <CardInput label="Phone" name="phone" icon={<Phone size={18} />} value={form.phone} onChange={handleChange} placeholder="+91 ..." />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 gap-6 text-foreground">
                     <CardInput label="Email" name="email" type="email" icon={<Mail size={18} />} value={form.email} onChange={handleChange} placeholder="hello@example.com" />
                     <CardInput label="Location" name="location" icon={<MapPin size={18} />} value={form.location} onChange={handleChange} placeholder="City, Country" />
                   </div>
 
                   {/* SERVICE SELECT */}
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/80 ml-1">
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-foreground ml-1">
                       Service Required
                     </label>
                     <div className="relative group">
-                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors" size={18} />
+                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground group-focus-within:text-accent transition-colors" size={18} />
                       <select
                         name="service"
                         value={form.service}
@@ -174,7 +174,7 @@ export default function ContactForm() {
                           </optgroup>
                         ))}
                       </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-foreground">
                         <ArrowRight size={14} className="rotate-90" />
                       </div>
                     </div>
@@ -189,7 +189,7 @@ export default function ContactForm() {
                         exit={{ opacity: 0, height: 0 }}
                         className="space-y-4 overflow-hidden"
                       >
-                        <label className="text-[10px] uppercase tracking-widest font-bold  dark:text-white  flex items-center gap-2 ml-1">
+                        <label className="text-[10px] uppercase tracking-widest font-bold text-foreground  flex items-center gap-2 ml-1">
                           <Wallet size={14} />
                           Estimated Budget
                         </label>
@@ -215,7 +215,7 @@ export default function ContactForm() {
 
                   {/* MESSAGE */}
                   <div className="space-y-2">
-                    <label htmlFor="message" className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/80 ml-1">
+                    <label htmlFor="message" className="text-[10px] uppercase tracking-widest font-bold text-foreground/80 ml-1">
                       Project Summary
                     </label>
                     <textarea
@@ -253,7 +253,7 @@ export default function ContactForm() {
                 <h2 className="text-4xl font-black text-foreground uppercase tracking-tight">
                   Received!
                 </h2>
-                <p className="text-muted-foreground max-w-xs mx-auto">
+                <p className="text-foreground max-w-xs mx-auto">
                   Our team is reviewing your inquiry. We'll be in touch within 2 hours.
                 </p>
               </motion.div>
