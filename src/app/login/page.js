@@ -113,7 +113,7 @@ export default function LoginPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 w-full rounded-xl px-4 py-3 bg-background border border-border focus:ring-2 focus:ring-accent outline-none transition"
+                className="mt-1 w-full rounded-xl px-4 py-3 bg-background border border-border text-foreground focus:ring-2 focus:ring-accent outline-none transition"
               />
             </div>
 
