@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "no-referrer-when-downgrade" },
           { key: "Permissions-Policy", value: "geolocation=()" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; img-src 'self' data: https:; media-src 'self' data: https:; connect-src 'self' https:; font-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" },
         ],
       },
     ];

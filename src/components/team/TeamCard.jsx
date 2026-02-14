@@ -15,11 +15,16 @@ export default function TeamCard({ member, idx }) {
 
           <div className="relative w-full h-full">
             {
-              idx === 0 ? (
-                <Image src={member.image} alt={member.name} width={340} height={425} className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale hover:grayscale-0" priority />
-              ) : (
-                <Image src={member.image} alt={member.name} width={340} height={425} className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale hover:grayscale-0" loading="lazy" />
-              )
+              /* Remove `priority` from team thumbnails (non-LCP) and add `sizes` + lazy loading */
+              <Image
+                src={member.image}
+                alt={member.name}
+                width={340}
+                height={425}
+                sizes="(max-width: 640px) 100vw, 340px"
+                className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale hover:grayscale-0"
+                loading={idx === 0 ? "eager" : "lazy"}
+              />
             }
           </div>
 

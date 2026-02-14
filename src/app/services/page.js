@@ -243,7 +243,9 @@ export default memo(function ServicesPage() {
             src={activeService.image}
             alt={activeService.title}
             fill
+            sizes="(max-width: 640px) 100vw, 40vw"
             className="object-cover scale-105 transition-transform duration-700"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/10 to-transparent" />
         </div>
