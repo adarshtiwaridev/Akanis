@@ -68,19 +68,28 @@
         try {
           const res = await fetch("/api/contact");
           const data = await res.json();
-    const allowedServices = [
-    "ad-shoot",
-    "photo-shoot",
-    "videography",
-    "video-production",
-    "branding",
-    "social-media",
-    "marketing",
-    "website-design",
+          console.log("Fetched contacts:", data);
+     const allowedServices = [
+     "ad-shoot",
+        "photo-shoot",
+        "videography",
+        "video-production",
+
+        // Digital Presence
+        "branding",
+        "social-media",
+        "marketing",
+        "website-design",
+
+        // App & Web Development
+        "web-dev",
+        "app-dev",
+        "ui-ux",
+        "custom-software",
   ];
 
 
-          setContacts(data.filter((c) => allowed.includes(c.service)));
+          setContacts(data.filter((c) => allowedServices.includes(c.service)));
   // setContacts(data);
         } catch (err) {
           console.error("Contact fetch error:", err);
