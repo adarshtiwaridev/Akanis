@@ -2,7 +2,7 @@ import "./globals.css";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { Toaster } from "sonner";
-
+import FloatingActions from "../components/common/FloatingActions";
 export const metadata = {
   metadataBase: new URL("https://www.studioname.in"),
   title: {
@@ -82,6 +82,8 @@ export default function RootLayout({ children }) {
         >
           {children}
         </main>
+
+        <FloatingActions />
 
         <footer role="contentinfo">
           <Footer />

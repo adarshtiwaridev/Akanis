@@ -13,6 +13,7 @@ import {
   Video,
   Trash2,
 } from "lucide-react";
+import { set } from "mongoose";
 
 /* ================= CONSTANTS ================= */
 const ITEMS_PER_PAGE = 5;
@@ -68,17 +69,20 @@ export default function DashboardClient() {
       try {
         const res = await fetch("/api/contact");
         const data = await res.json();
-        const allowed = [
-          "ad-shoot",
-          "photo-shoot",
-          "videography",
-          "video-production",
-          "branding",
-          "social-media",
-          "marketing",
-        ];
+   const allowedServices = [
+  "ad-shoot",
+  "photo-shoot",
+  "videography",
+  "video-production",
+  "branding",
+  "social-media",
+  "marketing",
+  "website-design",
+];
+
 
         setContacts(data.filter((c) => allowed.includes(c.service)));
+// setContacts(data);
       } catch (err) {
         console.error("Contact fetch error:", err);
       } finally {
@@ -306,23 +310,39 @@ const handleUpload = async () => {
   return (
     <div className="min-h-screen bg-background text-foreground mt-20 px-8 py-10">
 
-      {/* ================= FOUNDER SECTION ================= */}
-      <div className=" mx-auto mb-14 rounded-3xl border hover:border-b-amber-800 border-border bg-card px-1 py-5 flex flex-col md:flex-row gap-8 items-center">
-        <div className="relative h-28 w-28 rounded-full overflow-hidden border border-border">
-          <Image src="/photos/image03.avif" alt="Founder" fill sizes="112px" className="object-cover" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-extrabold">Adarsh Tiwari</h2>
-          <p className="text-sm text-foreground/60 mt-1">
-            Founder & Full-Stack Engineer
-          </p>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/80">
-            “We don’t chase trends — we build systems that last.  
-            Every product here is crafted with discipline, performance,
-            and long-term vision in mind.”
-          </p>
-        </div>
-      </div>
+  {/* ================= FOUNDER SECTION ================= */}
+<div className="max-w-6xl mx-auto mb-16 rounded-3xl border border-border bg-card px-6 py-10 flex flex-col md:flex-row gap-10 items-center transition-all duration-300 hover:shadow-xl hover:border-amber-700/60">
+
+  {/* Founder Image */}
+  <div className="relative h-40 w-40 rounded-full overflow-hidden border-4 border-amber-600/30 shadow-lg">
+    <Image
+      src="/photos/brand.jpg" // Use a high-quality professional portrait
+      alt="Founder of Akanis Production"
+      fill
+      sizes="160px"
+      className="object-cover"
+      priority
+    />
+  </div>
+
+  {/* Founder Content */}
+  <div className="text-center md:text-left">
+    <h2 className="text-3xl font-bold tracking-tight">
+      Nishant  Tiwari
+    </h2>
+
+    <p className="text-sm text-amber-600 font-medium mt-2">
+      Founder & Creative Director, Akanis Production
+    </p>
+
+    <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
+      “At Akanis Production, we don’t follow trends — we craft timeless visual
+      experiences. Every frame, every campaign, and every story is built with
+      precision, discipline, and a long-term creative vision.”
+    </p>
+  </div>
+</div>
+
 
       {/* ================= HEADER ================= */}
       <div className="flex flex-wrap gap-5 items-center justify-between mb-10">
