@@ -129,7 +129,7 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-xl px-4 py-3 pr-12 bg-background border border-border focus:ring-2 focus:ring-accent outline-none transition"
+                  className="w-full rounded-xl px-4 py-3 pr-12 bg-background text-foreground border border-border focus:ring-2 focus:ring-accent outline-none transition"
                 />
                 <button
                   type="button"
