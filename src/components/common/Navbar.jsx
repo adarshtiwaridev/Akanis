@@ -197,7 +197,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-[55] bg-black/20 dark:bg-white/5 backdrop-blur-[4px]"
+            className="fixed inset-0 z-[52] bg-black/20 dark:bg-white/5 backdrop-blur-[4px]"
           />
         )}
       </AnimatePresence>
