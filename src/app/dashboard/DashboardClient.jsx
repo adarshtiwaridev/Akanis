@@ -114,10 +114,12 @@
     /* ================= PAGINATION ================= */
     const totalPages = Math.ceil(contacts.length / ITEMS_PER_PAGE);
 
-    const paginatedContacts = useMemo(() => {
-      const start = (page - 1) * ITEMS_PER_PAGE;
-      return contacts.slice(start, start + ITEMS_PER_PAGE);
-    }, [contacts, page]);
+  const paginatedContacts = useMemo(() => {
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  return contacts.slice(start, start + ITEMS_PER_PAGE);
+}, [contacts, page]);
+
+if (!contacts.length) return <p>No data</p>;
 
   /* ================= UPLOAD ================= */
 

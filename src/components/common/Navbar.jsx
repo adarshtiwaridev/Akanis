@@ -62,8 +62,11 @@ export default function Navbar() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-
-  if (!mounted) return null;
+useEffect(() => {
+  if (!mounted) return;
+  document.documentElement.classList.toggle("dark", dark);
+  localStorage.setItem("theme", dark ? "dark" : "light");
+}, [dark, mounted]);
 
   // ===== MEMOIZED NAV ITEMS =====
   const navItems = useMemo(() => [
