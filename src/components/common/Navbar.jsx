@@ -67,7 +67,7 @@ const navItems = [
           className="flex flex-col leading-none text-white"
            
         >
-          <h1 className="text-2xl font-black uppercase tracking-[0.3em]">AKANIS</h1>
+          <h1 className="text-2xl font-black uppercase tracking-[0.3em]">VORITEMEDIA</h1>
           <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">Production</h2>
         </motion.div>
       </div>

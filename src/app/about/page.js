@@ -47,7 +47,7 @@ const AboutPage = () => {
             animate={{ y: 0, opacity: 1 }}
             className="text-[15vw] md:text-[10rem] font-black italic tracking-tighter"
           >
-            AKANIS<span className="text-accent">.</span>
+            VORITEMEDIA<span className="text-accent">.</span>
           </motion.h1>
 
           <motion.p
@@ -214,7 +214,7 @@ const AboutPage = () => {
           </h2>
 
           <p className="text-xl leading-relaxed opacity-60 font-medium">
-            Akanis blends cinematic storytelling with digital craftsmanship —
+            voritemedia blends cinematic storytelling with digital craftsmanship —
             brands that look strong and work even stronger.
           </p>
         </section>

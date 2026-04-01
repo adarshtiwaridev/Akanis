@@ -34,4 +34,104 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Akanis
+# voritemedia
+
+```
+voritemedia
+├─ eslint.config.mjs
+├─ next-env.d.ts
+├─ next.config.ts
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ public
+│  └─ photos
+│     ├─ banner.avif
+│     ├─ brand.jpg
+│     ├─ image01.jpg
+│     ├─ image02.avif
+│     ├─ image03.avif
+│     ├─ image04.avif
+│     ├─ marketing.avif
+│     ├─ mobile-app.jpg
+│     ├─ mobile.avif
+│     ├─ mountain.jpg
+│     ├─ netflix.jpg
+│     ├─ reel.jpg
+│     ├─ software.avif
+│     └─ web.avif
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ api
+│  │  │  ├─ auth
+│  │  │  │  └─ route.js
+│  │  │  ├─ cloudinary-signature
+│  │  │  │  └─ route.js
+│  │  │  ├─ contact
+│  │  │  │  └─ route.js
+│  │  │  ├─ gallery
+│  │  │  │  └─ route.js
+│  │  │  ├─ testimonials
+│  │  │  │  └─ route.js
+│  │  │  └─ upload
+│  │  │     └─ proxy
+│  │  │        └─ route.js
+│  │  ├─ contact
+│  │  │  └─ page.js
+│  │  ├─ contactform
+│  │  │  └─ page.js
+│  │  ├─ dashboard
+│  │  │  ├─ DashboardClient.jsx
+│  │  │  └─ page.js
+│  │  ├─ Gallery
+│  │  │  └─ page.js
+│  │  ├─ globals.css
+│  │  ├─ layout.js
+│  │  ├─ login
+│  │  │  └─ page.js
+│  │  ├─ page.js
+│  │  ├─ portfolio
+│  │  │  └─ page.js
+│  │  ├─ services
+│  │  │  └─ page.js
+│  │  └─ work
+│  │     └─ page.js
+│  ├─ components
+│  │  ├─ common
+│  │  │  ├─ Button.jsx
+│  │  │  ├─ Footer.jsx
+│  │  │  └─ Navbar.jsx
+│  │  └─ home
+│  │     ├─ Hero.jsx
+│  │     ├─ PortfolioPreview.jsx
+│  │     ├─ ServicesPreview.jsx
+│  │     └─ Testimonials.jsx
+│  ├─ config
+│  │  └─ site.js
+│  ├─ data
+│  │  ├─ portfolio.js
+│  │  ├─ services.js
+│  │  └─ testimonials.js
+│  ├─ hooks
+│  │  └─ useScrollTop.js
+│  ├─ lib
+│  │  ├─ dbConnect.js
+│  │  ├─ email.js
+│  │  └─ uploadToCloudinaryServer.js
+│  ├─ models
+│  │  ├─ Booking.js
+│  │  ├─ Contact.js
+│  │  ├─ Gallery.js
+│  │  └─ Testimonial.js
+│  ├─ styles
+│  │  └─ animations.css
+│  └─ utils
+│     ├─ compressVideo.client.js
+│     ├─ constants.js
+│     ├─ helpers.js
+│     └─ validators.js
+├─ tailwind.config.js
+└─ tsconfig.json
+
+```

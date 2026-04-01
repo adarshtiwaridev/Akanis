@@ -109,7 +109,7 @@ useEffect(() => {
             <motion.div custom={0} variants={textVariant} className="flex items-center gap-3 mb-6">
               <span className="h-[1px] w-12 bg-foreground/30" />
               <span className="text-[10px] uppercase tracking-[0.5em] font-bold text-accent">
-                Akanis Digital House
+                voritemedia
               </span>
             </motion.div>
 
@@ -212,7 +212,7 @@ useEffect(() => {
               className="absolute -top-6 -right-6 w-28 h-28 bg-accent text-white rounded-full flex items-center justify-center border-4 border-background z-[100] shadow-xl"
             >
               <p className="text-[10px] font-black text-center leading-tight uppercase">
-                Akanis<br/>2026
+                voritemedia<br/>2026
               </p>
             </motion.div>
           </motion.div>

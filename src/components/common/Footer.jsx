@@ -18,9 +18,9 @@ export default function Footer() {
     <footer className="relative overflow-hidden bg-background text-foreground pt-24 pb-10 transition-colors duration-700">
       
       {/* BACKGROUND GIANT TEXT (Watermark Effect) */}
-      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 select-none pointer-events-none">
-        <h2 className="text-[20vw] font-black uppercase tracking-tighter opacity-[0.03] dark:opacity-[0.05] leading-none">
-          AKANIS
+      <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 select-none pointer-events-none">
+        <h2 className="text-[15vw] font-black uppercase tracking-tighter opacity-[0.03] dark:opacity-[0.05] leading-none">
+          VORITEMEDIA
         </h2>
       </div>
 
@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="lg:col-span-5 space-y-8">
             <div>
               <h2 className="text-4xl font-black uppercase tracking-[0.2em] flex items-center gap-2">
-                <span className="text-accent animate-pulse">●</span> AKANIS
+                <span className="text-accent animate-pulse">●</span> VORITEMEDIA
               </h2>
               <p className="mt-4 text-xs tracking-[0.5em] font-bold opacity-40 uppercase">
                 Visual Stories · Digital Code
@@ -67,10 +67,10 @@ export default function Footer() {
           <div className="lg:col-span-4 space-y-6">
              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Get in Touch</h3>
              <div className="space-y-4">
-               <LinkItem icon={<Instagram size={18} />} text="@akanis_production" href="https://instagram.com/akanis_production" />
-               <LinkItem icon={<Mail size={18} />} text="akanisproduction@gmail.com" href="mailto:akanisproduction@gmail.com" />
+               <LinkItem icon={<Instagram size={18} />} text="@voritemedia" href="https://instagram.com/voritemedia" />
+               <LinkItem icon={<Mail size={18} />} text="voritemedia@gmail.com" href="mailto:voritemedia@gmail.com" />
                <LinkItem icon={<Phone size={18} />} text="+91 88813 61999" href="tel:+918881361999" />
-               <LinkItem icon={<Globe size={18} />} text="View Digital Portfolio" href="https://akanisproduction.my.canva.site" />
+               <LinkItem icon={<Globe size={18} />} text="View Digital Portfolio" href="https://voritemedia.my.canva.site" />
              </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
           
           <span className="text-[10px] font-bold tracking-widest opacity-40 uppercase">
-            © {new Date().getFullYear()} Akanis Productions — All Rights Reserved
+            © {new Date().getFullYear()} voritemedia — All Rights Reserved
           </span>
 
           <div className="flex gap-6 opacity-40 text-[9px] font-bold uppercase tracking-widest">

@@ -58,7 +58,7 @@ export async function POST(req) {
   
     await sendMail({
   to: email,
-  subject: "We’ve received your inquiry – Akanis Production",
+  subject: "We've received your inquiry – voritemedia",
   html: `
   <div style="margin:0;padding:0;background-color:#f4f6f8;">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -72,7 +72,7 @@ export async function POST(req) {
             <tr>
               <td style="background:#0f172a;padding:20px 24px;">
                 <h2 style="margin:0;color:#ffffff;font-size:20px;font-weight:600;">
-                  Akanis Production
+                  voritemedia
                 </h2>
                 <p style="margin:4px 0 0;color:#cbd5e1;font-size:13px;">
                   Creative • Digital • Development
@@ -88,7 +88,7 @@ export async function POST(req) {
                 </p>
 
                 <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#374151;">
-                  Thank you for reaching out to <b>Akanis Production</b>.
+                  Thank you for reaching out to <b>voritemedia</b>.
                   We’ve successfully received your inquiry regarding
                   <b>${service}</b>.
                 </p>
@@ -114,7 +114,7 @@ export async function POST(req) {
 
                 <p style="margin:24px 0 0;font-size:14px;">
                   Best regards,<br/>
-                  <b>Team Akanis Production</b>
+                  <b>Team voritemedia</b>
                 </p>
               </td>
             </tr>
@@ -123,7 +123,7 @@ export async function POST(req) {
             <tr>
               <td style="background:#f1f5f9;padding:14px 24px;text-align:center;">
                 <p style="margin:0;font-size:12px;color:#6b7280;">
-                  © ${new Date().getFullYear()} Akanis Production. All rights reserved.
+                  © ${new Date().getFullYear()} voritemedia. All rights reserved.
                 </p>
               </td>
             </tr>

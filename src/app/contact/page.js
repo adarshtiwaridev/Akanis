@@ -30,12 +30,12 @@ const ContactPage = () => {
             <motion.h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none">
               Contact <br />
               <span className="italic opacity-30 underline decoration-blue-500 decoration-4 underline-offset-8">
-                Akanis
+                voritemedia
               </span>
             </motion.h1>
 
             <p className="max-w-md text-muted-foreground text-lg">
-              Akanis Production is a visual storytelling and digital architecture
+              voritemedia is a visual storytelling and digital architecture
               studio crafting cinematic films, premium photography, and
               performance-driven web experiences.
             </p>
@@ -59,14 +59,14 @@ const ContactPage = () => {
             {/* CONTACT LINKS */}
             <div className="grid sm:grid-cols-2 gap-4 pt-6">
               <LinkItem
-                href="https://instagram.com/akanis_production"
+                href="https://instagram.com/voritemedia"
                 icon={<Instagram size={18} />}
-                text="@akanis_production"
+                text="@voritemedia"
               />
               <LinkItem
-                href="mailto:akanisproduction@gmail.com"
+                href="mailto:voritemedia@gmail.com"
                 icon={<Mail size={18} />}
-                text="akanisproduction@gmail.com"
+                text="voritemedia@gmail.com"
               />
               <LinkItem
                 href="tel:+918299841360"
@@ -76,7 +76,7 @@ const ContactPage = () => {
               <LinkItem
                 href="#"
                 icon={<Linkedin size={18} />}
-                text="Akanis Production"
+                text="voritemedia"
               />
           
             </div>
@@ -90,7 +90,7 @@ const ContactPage = () => {
             className="relative w-full h-[520px] rounded-[2.5rem] overflow-hidden border border-border shadow-2xl"
           >
             <iframe
-              title="Akanis Location"
+              title="voritemedia Location"
             src="https://www.google.com/maps?q=Lucknow%20Uttar%20Pradesh%20262028&output=embed"
               className="w-full h-full border-0 grayscale invert-[0.9] dark:invert-0"
               loading="lazy"
