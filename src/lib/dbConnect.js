@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGO_URI;
- console.log("MONGODB_URI:", MONGODB_URI);
 let cached = global.mongoose || { conn: null, promise: null };
 
 export default async function dbConnect() {

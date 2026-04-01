@@ -37,10 +37,10 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
    if (data.token) {
     localStorage.setItem("auth_token", data.token);
-    console.log("token saved ")
-   }
-   else {    console.log("No token received");
-   }
+    // token saved
+    } else {
+      // no token received
+    }
       toast.success("Welcome back 🚀");
       router.push("/dashboard");
     } catch (err) {
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 w-full rounded-xl px-4 py-3 bg-background border border-border focus:ring-2 focus:ring-accent outline-none transition"
+                className="mt-1 w-full rounded-xl px-4 py-3 bg-background border border-border text-foreground focus:ring-2 focus:ring-accent outline-none transition"
               />
             </div>
 
@@ -129,11 +129,12 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full rounded-xl px-4 py-3 pr-12 bg-background border border-border focus:ring-2 focus:ring-accent outline-none transition"
+                  className="w-full rounded-xl px-4 py-3 pr-12 bg-background text-foreground border border-border focus:ring-2 focus:ring-accent outline-none transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

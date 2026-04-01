@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Phone, ArrowUpRight, Play, Globe, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {  useRouter} from 'next/navigation';
@@ -41,6 +42,15 @@ const useTypewriter = (words, speed = 120, pause = 1500) => {
 const Hero = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+    const handler = (e) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
 
   
   const typedWord = useTypewriter(
@@ -96,7 +106,7 @@ useEffect(() => {
       
       {/* 1. ADAPTIVE BACKGROUND MESH */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 dark:bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
+        <div className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 dark:bg-blue-600/20 rounded-full blur-[120px] ${prefersReducedMotion ? "" : "animate-pulse"}`} />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 rounded-full blur-[120px]" />
         <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
@@ -182,14 +192,19 @@ useEffect(() => {
                       zIndex: isHovered ? 50 : 10 - i 
                     }}
                     exit={{ opacity: 0, x: -50, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 150, damping: 20 }}
                     className="absolute inset-0 overflow-hidden rounded-3xl border border-border shadow-2xl bg-card"
                   >
-                    <img 
-                      src={img} 
-                      className={`w-full h-full object-cover transition-all duration-500 ${isHovered ? 'grayscale-0' : 'grayscale opacity-60'}`} 
-                      alt="Portfolio" 
-                    />
+                    <div className="w-full h-full relative">
+                      <Image
+                        src={img}
+                        alt={`Portfolio ${i + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority={i === 0}
+                        className={`object-cover transition-all duration-500 ${isHovered ? 'grayscale-0' : 'grayscale opacity-60'}`}
+                      />
+                    </div>
                     {/* Progress Bar for Fast Slide */}
                     {isHovered && (
                       <motion.div 
@@ -207,8 +222,8 @@ useEffect(() => {
 
             {/* Badge - Color Adapts */}
             <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              animate={prefersReducedMotion ? {} : { rotate: 360 }}
+              transition={prefersReducedMotion ? {} : { duration: 10, repeat: Infinity, ease: "linear" }}
               className="absolute -top-6 -right-6 w-28 h-28 bg-accent text-white rounded-full flex items-center justify-center border-4 border-background z-[100] shadow-xl"
             >
               <p className="text-[10px] font-black text-center leading-tight uppercase">

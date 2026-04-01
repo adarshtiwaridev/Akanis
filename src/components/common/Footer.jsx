@@ -9,7 +9,6 @@ import {
   Globe,
   ArrowUp,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -44,10 +43,7 @@ export default function Footer() {
               Based in the heart of Lucknow, serving global brands.
             </p>
 
-            <button 
-              onClick={scrollToTop}
-              className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] hover:text-accent transition-colors"
-            >
+            <button onClick={scrollToTop} className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] hover:text-accent transition-colors" aria-label="Back to top">
               Back to Top <div className="p-2 rounded-full border border-border group-hover:bg-accent group-hover:text-white transition-all"><ArrowUp size={14} /></div>
             </button>
           </div>

@@ -2,35 +2,71 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import Image from "next/image";
 
 /* ================= VIDEO CARD ================= */
+/* ================= IMPROVED VIDEO CARD ================= */
 function VideoCard({ item }) {
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
 
-  const toggleMute = () => {
+  const toggleMute = (e) => {
+    // Prevent the click from triggering parent "View Project" or other links
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (videoRef.current) {
+      const newState = !isMuted;
+      videoRef.current.muted = newState;
+      setIsMuted(newState);
+    }
+  };
+
+  const playOnEnter = () => {
     if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted((prev) => !prev);
+    
+    // Ensure video is muted before playing to bypass browser autoplay blocks
+    videoRef.current.muted = isMuted; 
+    
+    const playPromise = videoRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn("Autoplay prevented:", error);
+      });
+    }
+  };
+
+  const pauseOnLeave = () => {
+    if (!videoRef.current) return;
+    videoRef.current.pause();
+    // Optional: videoRef.current.currentTime = 0; // Reset if you want it to restart
   };
 
   return (
-    <div className="relative h-full w-full group overflow-hidden">
+    <div 
+      className="relative h-full w-full group overflow-hidden cursor-pointer" 
+      onMouseEnter={playOnEnter} 
+      onMouseLeave={pauseOnLeave}
+    >
       <video
         ref={videoRef}
         src={item.url}
-        autoPlay
-        muted={isMuted}
         loop
         playsInline
+        defaultMuted // Helps with initial browser render
+        preload="metadata" // Better than "none" for seeing the first frame
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-      />
+      >
+        {item.captions && <track kind="captions" src={item.captions} srcLang="en" />}
+      </video>
 
+      {/* Mute Control - Positioned for easier clicking */}
       <button
         onClick={toggleMute}
-        className="relative bottom-0 right-0 z-10 rounded-full bg-black/60 p-2 text-white backdrop-blur hover:bg-black/80 transition"
+        aria-label={isMuted ? "Unmute" : "Mute"}
+        className="absolute bottom-4 right-4 z-30 rounded-full bg-black/60 p-2.5 text-white backdrop-blur-md hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
       >
-        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
       </button>
     </div>
   );
@@ -48,7 +84,7 @@ const WorksPage = () => {
         const data = await res.json();
         setWorks(data);
       } catch (err) {
-        console.error("Error fetching works:", err);
+        if (process.env.NODE_ENV === 'development') console.error("Error fetching works:", err);
       } finally {
         setLoading(false);
       }
@@ -97,11 +133,9 @@ const WorksPage = () => {
               {item.type === "video" ? (
                 <VideoCard item={item} />
               ) : (
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                <div className="relative h-full w-full">
+                  <Image src={item.url} alt={item.title || "Work image"} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                </div>
               )}
 
               {/* Overlay */}
