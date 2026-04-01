@@ -27,7 +27,7 @@ export default function Navbar() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [token, setToken] = useState(null);
 
-  // ===== INITIAL MOUNT =====
+
   useEffect(() => {
     setMounted(true);
 
@@ -74,7 +74,7 @@ useEffect(() => {
     token
       ? { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard }
       : { name: "Login", href: "/login", icon: User },
-    { name: "Gallery", href: "/gallery", icon: Image },
+    // { name: "Gallery", href: "/gallery", icon: Image },
     { name: "Contact", href: "/contact", icon: Phone },
     { name: "Contactform", href: "/contactform", icon: Calendar },
     { name: "About", href: "/about", icon: User },
@@ -92,17 +92,12 @@ useEffect(() => {
           transition={prefersReducedMotion ? { duration: 0 } : undefined}
           className="flex flex-col leading-none text-white"
         >
-<<<<<<< HEAD
-          <h1 className="text-2xl font-black uppercase tracking-[0.3em]">VORITEMEDIA</h1>
-          <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">Production</h2>
-=======
           <div className="text-2xl font-black uppercase tracking-[0.3em]">
-            AKANIS
+            Voritemedia
           </div>
           <div className="text-[0.6rem] font-bold uppercase tracking-[0.6em] opacity-70">
             Production
           </div>
->>>>>>> c85b6cbd8b2a04113a736ef38fe0b1d1da2f0960
         </motion.div>
       </div>
 

@@ -3,63 +3,79 @@ import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { Toaster } from "sonner";
 import FloatingActions from "../components/common/FloatingActions";
+
 export const metadata = {
-  metadataBase: new URL("https://www.studioname.in"),
+  metadataBase: new URL("https://www.voritemedia.com"),
   title: {
-    default: "StudioName | Digital Agency & Video Production in Lucknow",
-    template: "%s | StudioName - Lucknow Digital Agency",
+    default: "Vorite Media | Premium Digital Agency & Video Production in Delhi NCR",
+    template: "%s | Vorite Media - Leading Creative Agency",
   },
   description:
-    "StudioName is a full-service digital agency in Lucknow offering professional photography, video production, website design, web development, software development, branding, and digital marketing services.",
+    "Vorite Media is a premier full-service digital agency serving Delhi, Noida, Gurgaon, Ghaziabad, Faridabad, and Rohtak. We specialize in high-end photography, cinematic video production, web development, and strategic branding.",
 
   keywords: [
-    "Digital Agency in Lucknow",
-    "Video Production in Lucknow",
-    "Photography Studio Lucknow",
-    "Website Design Lucknow",
-    "Web Development Company Lucknow",
-    "Software Development Lucknow",
-    "Branding Agency Lucknow",
-    "Corporate Video Production",
-    "Wedding Photography Lucknow",
+    "Digital Agency in Delhi NCR",
+    "Video Production Noida",
+    "Creative Agency Gurgaon",
+    "Photography Studio Faridabad",
+    "Website Development Ghaziabad",
+    "Branding Agency Rohtak",
+    "Corporate Film Makers Delhi",
+    "Commercial Photography NCR",
+    "E-commerce Shoot Noida",
+    "Web Design Agency Gurgaon",
   ],
 
-  authors: [{ name: "StudioName Team" }],
-  creator: "StudioName",
-  publisher: "StudioName",
+  authors: [{ name: "Vorite Media Team" }],
+  creator: "Vorite Media",
+  publisher: "Vorite Media",
 
   openGraph: {
-    title: "StudioName | Digital & Media Agency in Lucknow",
+    title: "Vorite Media | Digital & Media Excellence in Delhi NCR",
     description:
-      "Leading digital agency in Lucknow providing photography, videography, website development, software solutions, and branding services.",
-    url: "https://www.studioname.in",
-    siteName: "StudioName",
+      "Transforming brands through cinematic video, high-end photography, and cutting-edge web solutions across Delhi, Noida, and Gurgaon.",
+    url: "https://www.voritemedia.com",
+    siteName: "Vorite Media",
+    images: [
+      {
+        url: "/og-image.jpg", // Ensure you have this in your public folder
+        width: 1200,
+        height: 630,
+        alt: "Vorite Media Digital Agency",
+      },
+    ],
     locale: "en_IN",
     type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "StudioName | Digital & Media Agency in Lucknow",
-    description:
-      "Photography, Video Production, Web & Software Development Agency in Lucknow.",
+    title: "Vorite Media | Digital Agency & Video Production",
+    description: "Premium Creative & Digital Solutions for brands in Delhi NCR and beyond.",
   },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col text-black antialiased">
-
+      <body className="min-h-screen flex flex-col text-slate-900 antialiased bg-white">
+        
         {/* Accessibility Skip Link */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only absolute top-2 left-2 bg-black text-white px-4 py-2 rounded"
+          className="sr-only focus:not-sr-only absolute top-4 left-4 z-50 bg-blue-600 text-white px-6 py-3 rounded-md shadow-lg"
         >
           Skip to main content
         </a>
@@ -71,7 +87,10 @@ export default function RootLayout({ children }) {
         <Toaster
           richColors
           position="top-right"
-          toastOptions={{ duration: 3000 }}
+          toastOptions={{ 
+            duration: 3000,
+            style: { borderRadius: '8px' } 
+          }}
         />
 
         <main
@@ -89,34 +108,40 @@ export default function RootLayout({ children }) {
           <Footer />
         </footer>
 
-        {/* Structured Data for Local SEO */}
+        {/* Structured Data for Local SEO (NCR Coverage) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "StudioName",
-              image: "https://www.studioname.in/logo.png",
-              url: "https://www.studioname.in",
-              telephone: "+91-XXXXXXXXXX",
-              address: {
+              "@type": "ProfessionalService",
+              "name": "Vorite Media",
+              "image": "https://www.voritemedia.com/logo.png",
+              "url": "https://www.voritemedia.com",
+              "telephone": "+91 8368507050",
+              "priceRange": "$$",
+              "address": {
                 "@type": "PostalAddress",
-                addressLocality: "Lucknow",
-                addressRegion: "Uttar Pradesh",
-                addressCountry: "India",
+                "streetAddress": "Your Office Address",
+                "addressLocality": "Noida",
+                "addressRegion": "Uttar Pradesh",
+                "postalCode": "201301",
+                "addressCountry": "India"
               },
-              geo: {
-                "@type": "GeoCoordinates",
-                latitude: "26.8467",
-                longitude: "80.9462",
-              },
-              sameAs: [
-                "https://www.instagram.com/studioname",
-                "https://www.linkedin.com/company/studioname",
+              "areaServed": [
+                { "@type": "City", "name": "Delhi" },
+                { "@type": "City", "name": "Noida" },
+                { "@type": "City", "name": "Gurgaon" },
+                { "@type": "City", "name": "Ghaziabad" },
+                { "@type": "City", "name": "Faridabad" },
+                { "@type": "City", "name": "Rohtak" }
               ],
-              description:
-                "StudioName is a digital and media agency in Lucknow providing photography, videography, website design, web development, software development, and branding services.",
+              "description": "Premium digital agency and video production house serving the Delhi NCR region.",
+              "sameAs": [
+                "https://www.instagram.com/voritemedia",
+                "https://www.linkedin.com/company/voritemedia",
+                "https://www.facebook.com/voritemedia"
+              ]
             }),
           }}
         />

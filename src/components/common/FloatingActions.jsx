@@ -7,8 +7,8 @@ const FloatingActions = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   // Configuration - Change these as needed
-  const whatsappNumber = "9473662794"; // Include country code, no '+'
-const message = "Hello Akanis Team, I hope you're doing well. I'm interested in learning more about your services and would love to connect.";
+  const whatsappNumber = "8368507050"; // Include country code, no '+'
+const message = "Hello Voritemedia Team, I hope you're doing well. I'm interested in learning more about your services and would love to connect.";
 
   // Handle scroll visibility for the 'Back to Top' button
   useEffect(() => {
