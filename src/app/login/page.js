@@ -30,21 +30,37 @@ export default function LoginPage() {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
-   if (data.token) {
-    localStorage.setItem("auth_token", data.token);
-    // token saved
-    } else {
-      // no token received
-    }
+      let data = null;
+      try {
+        data = await res.json().catch(() => null);
+      } catch (parseErr) {
+        console.warn("Failed to parse auth response:", parseErr);
+      }
+
+      if (!res.ok) {
+        const errorMsg = data?.message || `Login failed (${res.status})`;
+        throw new Error(errorMsg);
+      }
+
+      if (!data) {
+        throw new Error("Empty response from auth server");
+      }
+
+      if (!data.token) {
+        throw new Error("No authentication token received");
+      }
+
+      localStorage.setItem("auth_token", data.token);
       toast.success("Welcome back 🚀");
       router.push("/dashboard");
     } catch (err) {
-      setError(err.message);
+      const errorMsg = err.message || "Login failed";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

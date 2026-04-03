@@ -245,23 +245,34 @@ export async function POST(req) {
       }
 
       return NextResponse.json(result, { status: 200 });
-      } catch (cloudinaryErr) {
-        if (process.env.NODE_ENV === "development") console.error("[PROXY] ❌ Cloudinary upload error:", cloudinaryErr.message || cloudinaryErr);
-      // Cleanup temp file even on error (retry)
+    } catch (cloudinaryErr) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[PROXY] ❌ Cloudinary upload error:", cloudinaryErr.message || cloudinaryErr);
+      }
+
+      // Cleanup temp file even on error
       try {
         await fs.rm(file.filepath, { force: true }).catch(() => {});
       } catch (e) {
-        console.warn('[PROXY] Cleanup after error failed:', e?.message || e);
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[PROXY] Cleanup after error failed:", e?.message || e);
+        }
       }
 
-      // Return error response instead of throwing to avoid uncaughtException
+      // Return detailed error response
       return NextResponse.json(
-        { message: 'Cloudinary upload failed', error: cloudinaryErr?.message || String(cloudinaryErr) },
+        {
+          message: "Cloudinary upload failed",
+          error: cloudinaryErr?.message || String(cloudinaryErr),
+        },
         { status: 500 }
       );
     }
-      } catch (err) {
-    if (process.env.NODE_ENV === "development") console.error("[PROXY] ❌ Proxy upload error:", err.message || err);
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[PROXY] ❌ Proxy upload error:", err.message || err);
+    }
+
     return NextResponse.json(
       {
         message: "Upload failed",

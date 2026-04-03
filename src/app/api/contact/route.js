@@ -40,7 +40,7 @@ export async function POST(req) {
        OWNER EMAIL
     =============================== */
     await sendMail({
-      to: process.env.SMTP_USER,
+      to: process.env.SMTP_USER || process.env.MAIL_USER,
       subject: `📩 New Inquiry – ${service}`,
       html: `
         <h3>New Contact Submission</h3>

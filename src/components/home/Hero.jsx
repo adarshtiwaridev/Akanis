@@ -10,29 +10,32 @@ const useTypewriter = (words, speed = 120, pause = 1500) => {
   const [text, setText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
- 
-  useEffect(() => {
-    const current = words[wordIndex];
-    let timeout;
 
-    if (!isDeleting) {
-      timeout = setTimeout(() => {
-        setText(current.substring(0, text.length + 1));
-        if (text === current) {
-          setTimeout(() => setIsDeleting(true), pause);
-        }
-      }, speed);
-    } else {
-      timeout = setTimeout(() => {
-        setText(current.substring(0, text.length - 1));
-        if (text === "") {
-          setIsDeleting(false);
-          setWordIndex((prev) => (prev + 1) % words.length);
-        }
-      }, speed / 1.8);
+  useEffect(() => {
+    if (words.length === 0) {
+      setText("");
+      return;
     }
 
-    return () => clearTimeout(timeout);
+    const current = words[wordIndex];
+    let nextText = isDeleting
+      ? current.slice(0, text.length - 1)
+      : current.slice(0, text.length + 1);
+
+    let delay = isDeleting ? Math.max(60, speed / 2) : speed;
+
+    const timer = setTimeout(() => {
+      setText(nextText);
+
+      if (!isDeleting && nextText === current) {
+        setTimeout(() => setIsDeleting(true), pause);
+      } else if (isDeleting && nextText === "") {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+      }
+    }, delay);
+
+    return () => clearTimeout(timer);
   }, [text, isDeleting, wordIndex, words, speed, pause]);
 
   return text;
@@ -43,8 +46,11 @@ const Hero = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
     const handler = (e) => setPrefersReducedMotion(e.matches);
@@ -52,6 +58,13 @@ const Hero = () => {
     return () => mediaQuery.removeEventListener("change", handler);
   }, []);
 
+  useEffect(() => {
+    const mobileQuery = window.matchMedia("(hover: none)");
+    setIsMobile(mobileQuery.matches);
+    const handler = (e) => setIsMobile(e.matches);
+    mobileQuery.addEventListener("change", handler);
+    return () => mobileQuery.removeEventListener("change", handler);
+  }, []);
   
   const typedWord = useTypewriter(
     ["CRAFTING", "FILMING", "CREATING", "DESIGNING" , "BUILDING", "ENGINEERING"],
@@ -70,10 +83,6 @@ const router = useRouter();
 "/photos/image01.jpg"
  ];
 
- const isMobile = typeof window !== "undefined"
-  ? window.matchMedia("(hover: none)").matches
-  : false;
-
 
 useEffect(() => {
   let interval;
@@ -84,12 +93,12 @@ useEffect(() => {
     interval = setInterval(() => {
       setSliderIndex((prev) => (prev + 1) % images.length);
     }, 800);
-  } else {
+  } else if (sliderIndex !== 0) {
     setSliderIndex(0);
   }
 
   return () => clearInterval(interval);
-}, [isHovered, images.length, isMobile]);
+}, [isHovered, images.length, isMobile, sliderIndex]);
 
 
   const textVariant = {
@@ -100,6 +109,10 @@ useEffect(() => {
       transition: { delay: i * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] },
     }),
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <section className="relative min-h-screen bg-background text-foreground overflow-hidden selection:bg-accent selection:text-white transition-colors duration-700">
@@ -115,7 +128,7 @@ useEffect(() => {
         
         {/* 2. LEFT CONTENT */}
         <div className="lg:col-span-7">
-          <motion.div initial="hidden" animate="visible">
+          <motion.div initial={false} animate="visible">
             <motion.div custom={0} variants={textVariant} className="flex items-center gap-3 mb-6">
               <span className="h-[1px] w-12 bg-foreground/30" />
               <span className="text-[10px] uppercase tracking-[0.5em] font-bold text-accent">
@@ -126,7 +139,7 @@ useEffect(() => {
            {/* MAIN HEADING */}
             <h1 className="text-[12vw] lg:text-[7rem] leading-[0.85] font-black uppercase tracking-tighter">
               {typedWord} <br />
-              <span className="text-transparent stroke-text italic">
+              <span className="italic" style={{ WebkitTextStroke: '1px currentColor', color: 'transparent', opacity: 0.3 }}>
                 LEGACIES
               </span>
             </h1>
@@ -173,7 +186,7 @@ useEffect(() => {
             onHoverEnd={() => setIsHovered(false)}
             className="relative w-full h-full cursor-pointer perspective-1000"
           >
-            <AnimatePresence >
+            <AnimatePresence  initial={false}>
               {images.map((img, i) => {
                 // When hovered, only show the image at sliderIndex
                 // When NOT hovered, show them all stacked
@@ -181,7 +194,7 @@ useEffect(() => {
 
                 return isVisible && (
                   <motion.div
-                    key={i}
+                    key={`${img}-${i}`}
                     initial={{ opacity: 0, scale: 0.8, x: isHovered ? 50 : 0 }}
                     animate={{ 
                       opacity: 1, 

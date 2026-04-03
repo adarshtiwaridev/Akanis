@@ -1,186 +1,122 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import React from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
+/* ================= DATA ================= */
 const items = [
-  /* ================= VIDEO / REELS ================= */
-
   {
     id: 1,
     title: "Brand Launch Film",
     category: "Videography",
-    type: "video",
     src: "/photos/banner.avif",
-    details: {
-      platform: "YouTube / Instagram",
-      duration: "60 sec",
-      work: "Direction • Shooting • Color Grading",
-    },
   },
   {
     id: 2,
     title: "Cinematic Product Reel",
     category: "Video Reel",
-    type: "video",
     src: "/photos/software.avif",
-    details: {
-      platform: "Instagram Reels",
-      duration: "30 sec",
-      work: "Concept • Filming • Editing",
-    },
   },
   {
     id: 3,
     title: "Social Media Ad Reel",
     category: "Brand Ads",
-    type: "video",
     src: "/photos/web.avif",
-    details: {
-      platform: "Instagram / Facebook",
-      duration: "20 sec",
-      work: "Ad Creative • Motion • CTA",
-    },
   },
-
-  /* ================= WEBSITES ================= */
-
   {
     id: 4,
     title: "E-Commerce Website",
     category: "Web Development",
-    type: "web",
     src: "/photos/web.avif",
-    details: {
-      tech: "Next.js • Tailwind • Stripe",
-      features: "Cart • Payments • Admin Panel",
-      status: "Live Project",
-    },
   },
   {
     id: 5,
     title: "Startup Landing Page",
     category: "Web Design",
-    type: "web",
     src: "/photos/marketing.avif",
-    details: {
-      tech: "React • Framer Motion",
-      features: "SEO • Animations • Lead Capture",
-      status: "Client Project",
-    },
   },
-
-  /* ================= APPS ================= */
-
   {
     id: 6,
     title: "Mobile App Interface",
     category: "App Development",
-    type: "app",
     src: "/photos/mobile.avif",
-    details: {
-      tech: "React Native",
-      features: "Auth • API • Notifications",
-      status: "In Production",
-    },
-  },
-
-  /* ================= BRAND VIDEO ================= */
-
-  {
-    id: 7,
-    title: "Corporate Brand Film",
-    category: "Video Production",
-    type: "video",
-    src: "/photos/banner.avif",
-    details: {
-      platform: "Website / YouTube",
-      duration: "90 sec",
-      work: "Script • Shoot • Post-Production",
-    },
   },
 ];
 
-
+/* ================= COMPONENT ================= */
 const Gallery = () => {
-  
   return (
-    <section
-      
-      className="py-24 px-6 bg-background text-foreground transition-colors duration-700"
-    >
+    <section className="py-24 px-6 bg-background text-foreground">
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADER (THE ONE YOU WANTED) */}
-        <div className="mb-24 space-y-4">
-          <motion.h2
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ once: true }}
-            className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none"
-          >
+        {/* HEADER */}
+        <div className="mb-20 space-y-4">
+          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight">
             Selected{" "}
-            <span className="italic opacity-50 underline decoration-blue-500 decoration-4 underline-offset-8">
+            <span className="italic opacity-50 underline decoration-blue-500">
               Works
             </span>
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-md opacity-60 text-xs md:text-sm tracking-[0.3em] uppercase font-bold"
-          >
+          <p className="max-w-md opacity-60 text-xs md:text-sm tracking-widest uppercase font-bold">
             Visual Storytelling × Technical Architecture
-          </motion.p>
+          </p>
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {items.map((item, i) => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.6 }}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
               viewport={{ once: true }}
-              className="group relative flex flex-col cursor-pointer"
+              className="group cursor-pointer"
             >
               {/* IMAGE */}
-              <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-card border border-border/40 shadow-xl">
-                <motion.img
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
-                  src={item.src}
-                  alt={item.title}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
-                />
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border shadow-lg">
+                
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full h-full"
+                >
+                  <Image
+                    src={item.src}
+                    alt={item.title}
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 transition duration-700"
+                  />
+                </motion.div>
 
                 {/* HOVER OVERLAY */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
-                  <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-black translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <ArrowUpRight size={24} />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black">
+                    <ArrowUpRight size={20} />
                   </div>
                 </div>
               </div>
 
-              {/* CAPTION */}
-              <div className="mt-6 flex justify-between items-start">
+              {/* TEXT */}
+              <div className="mt-4 flex justify-between items-start">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">
+                  <span className="text-[10px] uppercase tracking-widest text-blue-500 font-bold">
                     {item.category}
                   </span>
-                  <h3 className="text-xl font-bold uppercase tracking-tighter mt-1 group-hover:text-blue-500 transition-colors">
+                  <h3 className="text-lg font-bold uppercase mt-1 group-hover:text-blue-500 transition">
                     {item.title}
                   </h3>
                 </div>
-                <div className="h-px w-8 bg-border mt-4 group-hover:w-12 group-hover:bg-blue-500 transition-all" />
+
+                <div className="h-px w-6 bg-border mt-3 group-hover:w-10 group-hover:bg-blue-500 transition-all" />
               </div>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );

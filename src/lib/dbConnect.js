@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGO_URI;
+console.log("Connecting to MongoDB with URI:", MONGODB_URI);
+
+if (!MONGODB_URI) {
+  throw new Error("Please define the MONGO_URI environment variable");
+}
 let cached = global.mongoose || { conn: null, promise: null };
 
 export default async function dbConnect() {

@@ -37,17 +37,22 @@
 
     const handleLogout = async () => {
       try {
-        const res = await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
-        if (!res.ok) throw new Error("Logout failed");
-        if(res.ok){
-          toast.success("Logged out successfully");
-          localStorage.removeItem("auth_token");
+        const res = await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "same-origin",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Logout failed (${res.status})`);
         }
+
+        toast.success("Logged out successfully");
+        localStorage.removeItem("auth_token");
         router.push("/login");
       } catch (err) {
-        // report error to toast and avoid leaking stack to production console
+        console.error("Logout error:", err);
         toast.error("Logout failed");
-        // fallback
+        // Fallback to direct navigation
         window.location.href = "/login";
       }
     }; 
@@ -67,32 +72,40 @@
       const fetchContacts = async () => {
         try {
           const res = await fetch("/api/contact");
-          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(`Contact API error: ${res.status}`);
+          }
+
+          const data = await res.json().catch(() => null);
+
+          if (!data || !Array.isArray(data)) {
+            console.warn("Invalid contact response format");
+            setContacts([]);
+            setLoading(false);
+            return;
+          }
+
           console.log("Fetched contacts:", data);
-     const allowedServices = [
-     "ad-shoot",
-        "photo-shoot",
-        "videography",
-        "video-production",
-
-        // Digital Presence
-        "branding",
-        "social-media",
-        "marketing",
-        "website-design",
-
-        // App & Web Development
-        "web-dev",
-        "app-dev",
-        "ui-ux",
-        "custom-software",
-  ];
-
+          const allowedServices = [
+            "ad-shoot",
+            "photo-shoot",
+            "videography",
+            "video-production",
+            "branding",
+            "social-media",
+            "marketing",
+            "website-design",
+            "web-dev",
+            "app-dev",
+            "ui-ux",
+            "custom-software",
+          ];
 
           setContacts(data.filter((c) => allowedServices.includes(c.service)));
-  // setContacts(data);
         } catch (err) {
           console.error("Contact fetch error:", err);
+          setContacts([]);
         } finally {
           setLoading(false);
         }
@@ -103,11 +116,30 @@
     /* ================= FETCH MEDIA ================= */
     useEffect(() => {
       const fetchMedia = async () => {
-        const res = await fetch(`/api/gallery?type=${mediaType}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setMedia(data);
+        try {
+          const res = await fetch(`/api/gallery?type=${mediaType}`);
+
+          if (!res.ok) {
+            console.warn(`Gallery fetch failed with status ${res.status}`);
+            setMedia([]);
+            return;
+          }
+
+          const data = await res.json().catch(() => null);
+
+          if (!data || !Array.isArray(data)) {
+            console.warn("Invalid gallery response format");
+            setMedia([]);
+            return;
+          }
+
+          setMedia(data);
+        } catch (err) {
+          console.error("Media fetch error:", err);
+          setMedia([]);
+        }
       };
+
       fetchMedia();
     }, [mediaType]);
 
@@ -195,12 +227,21 @@ if (!contacts.length) return <p>No data</p>;
           });
 
           if (!proxyRes.ok) {
-            const err = await proxyRes.json().catch(() => ({ message: "Upload failed" }));
-            toast.error(err?.message || "Proxy upload failed", { id: toastId });
-            throw new Error(err?.message || "Proxy upload failed");
+            let errorMsg = "Proxy upload failed";
+            try {
+              const err = await proxyRes.json().catch(() => null);
+              errorMsg = err?.message || errorMsg;
+            } catch (parseErr) {
+              console.warn("Failed to parse proxy error response:", parseErr);
+            }
+            toast.error(errorMsg, { id: toastId });
+            throw new Error(errorMsg);
           }
 
-          cloudData = await proxyRes.json();
+          cloudData = await proxyRes.json().catch(() => null);
+          if (!cloudData) {
+            throw new Error("Empty response from proxy upload");
+          }
           toast.success("Upload completed", { id: toastId });
         } catch (err) {
           toast.error(err?.message || "Upload failed", { id: toastId });
@@ -242,12 +283,21 @@ if (!contacts.length) return <p>No data</p>;
           );
 
           if (!cloudRes.ok) {
-            const err = await cloudRes.json().catch(() => ({}));
-            toast.error(err.error?.message || `Cloudinary ${resourceType} upload failed`, { id: toastId });
-            throw new Error(err.error?.message || `Cloudinary ${resourceType} upload failed`);
+            let errorMsg = `Cloudinary ${resourceType} upload failed`;
+            try {
+              const err = await cloudRes.json().catch(() => null);
+              if (err?.error?.message) errorMsg = err.error.message;
+            } catch (parseErr) {
+              console.warn("Failed to parse Cloudinary error response:", parseErr);
+            }
+            toast.error(errorMsg, { id: toastId });
+            throw new Error(errorMsg);
           }
 
-          cloudData = await cloudRes.json();
+          cloudData = await cloudRes.json().catch(() => null);
+          if (!cloudData) {
+            throw new Error("Empty response from Cloudinary");
+          }
         } catch (sigErr) {
           throw sigErr;
         }
@@ -271,11 +321,20 @@ if (!contacts.length) return <p>No data</p>;
       });
 
       if (!galleryRes.ok) {
-        const err = await galleryRes.json().catch(() => ({}));
-        throw new Error(err?.message || "Failed to save to database");
+        let errorMsg = "Failed to save to database";
+        try {
+          const err = await galleryRes.json().catch(() => null);
+          if (err?.message) errorMsg = err.message;
+        } catch (parseErr) {
+          console.warn("Failed to parse gallery save error response:", parseErr);
+        }
+        throw new Error(errorMsg);
       }
 
-      const savedMedia = await galleryRes.json();
+      const savedMedia = await galleryRes.json().catch(() => null);
+      if (!savedMedia) {
+        throw new Error("Empty response from gallery save");
+      }
 
       toast.success(`${resourceType === "video" ? "Video" : "Image"} uploaded successfully 🚀`);
 
@@ -298,23 +357,35 @@ if (!contacts.length) return <p>No data</p>;
 
     /* ================= DELETE MEDIA ================= */
     const handleDeleteMedia = async (id) => {
-      const res = await fetch(`/api/gallery?id=${id}`, { method: "DELETE", credentials: "same-origin" });
+      try {
+        const res = await fetch(`/api/gallery?id=${id}`, {
+          method: "DELETE",
+          credentials: "same-origin",
+        });
 
-      if (res.status === 401) {
-        router.push("/login");
-        return;
-      }
-      if(res.ok){
-          toast.success("Media deleted successfully");
-      } 
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
 
-      if (!res.ok) {
-        const err = await res.json();
-        console.error("Delete failed:", err);
-        alert(err?.message || "Delete failed");
-        return;
+        if (!res.ok) {
+          let errorMsg = "Delete failed";
+          try {
+            const err = await res.json().catch(() => null);
+            if (err?.message) errorMsg = err.message;
+          } catch (parseErr) {
+            console.warn("Failed to parse delete error response:", parseErr);
+          }
+          toast.error(errorMsg);
+          return;
+        }
+
+        toast.success("Media deleted successfully");
+        setMedia((prev) => prev.filter((m) => m._id !== id));
+      } catch (err) {
+        console.error("Delete media error:", err);
+        toast.error("Failed to delete media");
       }
-      setMedia((prev) => prev.filter((m) => m._id !== id));
     };
 
     return (

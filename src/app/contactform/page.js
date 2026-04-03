@@ -101,12 +101,27 @@ export default function ContactForm() {
     e.preventDefault();
     if (!form.service) return;
     setLoading(true);
+
     try {
-      // Mocking API call
-      await new Promise(res => setTimeout(res, 1500));
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to submit contact form");
+      }
+
       setSuccess(true);
+      setForm(initialForm);
     } catch (err) {
-      alert("Something went wrong.");
+      console.error("Contact form submit error:", err);
+      alert(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +136,7 @@ export default function ContactForm() {
         className="w-full max-w-3xl"
       >
         <div className="rounded-3xl bg-card border border-border shadow-2xl p-8 md:p-12">
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {!success ? (
               <motion.div
                 key="form-content"
