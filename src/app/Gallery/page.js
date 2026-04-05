@@ -88,6 +88,7 @@ const Gallery = () => {
                     src={item.src}
                     alt={item.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover grayscale group-hover:grayscale-0 transition duration-700"
                   />
                 </motion.div>

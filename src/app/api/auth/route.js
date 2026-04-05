@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { authRateLimit } from "../../../lib/rateLimit";
 
 export async function POST(req) {
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    authRateLimit(req, {}, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
   try {
     const { email, password } = await req.json();
 
@@ -47,8 +56,7 @@ export async function POST(req) {
       path: "/",
     });
 
- 
-   
+
 
     return response;
 

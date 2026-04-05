@@ -138,8 +138,8 @@ useEffect(() => {
 
            {/* MAIN HEADING */}
             <h1 className="text-[12vw] lg:text-[7rem] leading-[0.85] font-black uppercase tracking-tighter">
-              {typedWord} <br />
-              <span className="italic" style={{ WebkitTextStroke: '1px currentColor', color: 'transparent', opacity: 0.3 }}>
+              <span className="block">{typedWord}</span>
+              <span className="block italic" role="region" aria-live="polite" style={{ WebkitTextStroke: '1px currentColor', color: 'transparent', opacity: 0.3 }}>
                 LEGACIES
               </span>
             </h1>

@@ -2,10 +2,86 @@ import { NextResponse } from "next/server";
 import { sendMail } from "../../../lib/email";
 import dbConnect from "../../../lib/dbConnect";
 import Contact from "../../../models/Contact";
+import { contactRateLimit } from "../../../lib/rateLimit";
+import { z } from "zod";
+import jwt from "jsonwebtoken";
+
+const contactSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  service: z.enum([
+    "ad-shoot",
+    "photo-shoot",
+    "videography",
+    "video-production",
+    "branding",
+    "social-media",
+    "marketing",
+    "website-design",
+    "web-dev",
+    "app-dev",
+    "ui-ux",
+    "custom-software",
+  ]),
+  budget: z.string().optional(),
+  location: z.string().optional(),
+  message: z.string().min(10).max(2000),
+});
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Auth middleware for GET
+function authenticate(req) {
+  const token = req.cookies.get('auth_token')?.value;
+  if (!token) return null;
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(req) {
+  const user = authenticate(req);
+  if (!user) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    await dbConnect();
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    return NextResponse.json(contacts, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/contact error:", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
 
 export async function POST(req) {
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    contactRateLimit(req, {}, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
   try {
     const body = await req.json();
+
+    // Validate input
+    const validatedData = contactSchema.parse(body);
 
     const {
       name,
@@ -15,14 +91,7 @@ export async function POST(req) {
       budget,
       location,
       message,
-    } = body;
-
-    if (!name || !email || !service || !message) {
-      return NextResponse.json(
-        { message: "Required fields missing" },
-        { status: 400 }
-      );
-    }
+    } = validatedData;
 
     await dbConnect();
 
@@ -44,14 +113,14 @@ export async function POST(req) {
       subject: `📩 New Inquiry – ${service}`,
       html: `
         <h3>New Contact Submission</h3>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Phone:</b> ${phone || "-"}</p>
-        <p><b>Service:</b> ${service}</p>
-        <p><b>Budget:</b> ${budget || "-"}</p>
-        <p><b>Location:</b> ${location || "-"}</p>
+        <p><b>Name:</b> ${escapeHtml(name)}</p>
+        <p><b>Email:</b> ${escapeHtml(email)}</p>
+        <p><b>Phone:</b> ${escapeHtml(phone || "-")}</p>
+        <p><b>Service:</b> ${escapeHtml(service)}</p>
+        <p><b>Budget:</b> ${escapeHtml(budget || "-")}</p>
+        <p><b>Location:</b> ${escapeHtml(location || "-")}</p>
         <p><b>Message:</b></p>
-        <p>${message}</p>
+        <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
       `,
     });
 
@@ -84,13 +153,13 @@ export async function POST(req) {
             <tr>
               <td style="padding:28px 24px;color:#111827;">
                 <p style="margin:0 0 12px;font-size:15px;">
-                  Hi <b>${name}</b>,
+                  Hi <b>${escapeHtml(name)}</b>,
                 </p>
 
                 <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#374151;">
                   Thank you for reaching out to <b>voritemedia</b>.
-                  We’ve successfully received your inquiry regarding
-                  <b>${service}</b>.
+                  We've successfully received your inquiry regarding
+                  <b>${escapeHtml(service)}</b>.
                 </p>
 
                 <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#374151;">
@@ -101,9 +170,9 @@ export async function POST(req) {
                 <!-- Info Box -->
                 <div style="background:#f8fafc;border-left:4px solid #0f172a;padding:12px 14px;margin:20px 0;">
                   <p style="margin:0;font-size:13px;color:#374151;">
-                    <b>Service:</b> ${service}<br/>
-                    ${budget ? `<b>Budget:</b> ${budget}<br/>` : ``}
-                    ${location ? `<b>Location:</b> ${location}` : ``}
+                    <b>Service:</b> ${escapeHtml(service)}<br/>
+                    ${budget ? `<b>Budget:</b> ${escapeHtml(budget)}<br/>` : ``}
+                    ${location ? `<b>Location:</b> ${escapeHtml(location)}` : ``}
                   </p>
                 </div>
 
@@ -145,22 +214,13 @@ export async function POST(req) {
     );
 
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { message: "Validation error", errors: error.errors },
+        { status: 400 }
+      );
+    }
     console.error("Contact API error:", error);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    await dbConnect();
-    const contacts = await Contact.find().sort({ createdAt: -1 });
-
-    return NextResponse.json(contacts, { status: 200 });
-  } catch (error) {
-    console.error("Contact GET error:", error);
     return NextResponse.json(
       { message: "Server error" },
       { status: 500 }

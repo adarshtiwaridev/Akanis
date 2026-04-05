@@ -48,7 +48,7 @@ function VideoCard({ item }) {
         preload="metadata"
         className="h-full w-full object-cover transition-transform duration-1000 group-hover/video:scale-105"
       >
-        {item.captions && <track kind="captions" src={item.captions} srcLang="en" />}
+        {item.captions && <track kind="captions" src={item.captions} srcLang="en" default />}
       </video>
 
       {/* Subtle Play Indicator */}
@@ -135,7 +135,7 @@ const WorksPage = () => {
                     src={item.url}
                     alt={item.title || "Project"}
                     fill
-                    className="object-cover transition-transform duration-1000 scale-105 group-hover:scale-100"
+                    className="object-center transition-transform duration-1000 scale-105 group-hover:scale-100"
                   />
                 )}
                 

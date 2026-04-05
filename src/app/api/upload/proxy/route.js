@@ -14,7 +14,7 @@ cloudinary.config({
 // Utility function to parse FormData with formidable v3
 async function parseFormData(req) {
   const form = new IncomingForm({
-    maxFileSize: 2 * 1024 * 1024 * 1024, // 2GB
+    maxFileSize: 500 * 1024 * 1024, // 500MB max
     maxFields: 10,
     maxFieldsSize: 2 * 1024 * 1024, // 2MB for field data
     uploadDir: os.tmpdir(),

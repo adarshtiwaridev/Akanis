@@ -9,7 +9,6 @@ import {
   MapPin,
   Wallet,
   Briefcase,
-  CheckCircle,
   ArrowRight,
   MessageSquare,
 } from "lucide-react";
@@ -172,6 +171,7 @@ export default function ContactForm() {
                     <div className="relative group">
                       <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground group-focus-within:text-accent transition-colors" size={18} />
                       <select
+                        id="service"
                         name="service"
                         value={form.service}
                         onChange={handleChange}
@@ -261,6 +261,7 @@ export default function ContactForm() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="py-20 text-center space-y-6"
+                aria-live="polite"
               >
                 <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
                   <CheckCircle size={40} className="text-accent" />

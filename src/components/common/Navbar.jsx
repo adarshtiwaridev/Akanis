@@ -62,11 +62,6 @@ export default function Navbar() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-useEffect(() => {
-  if (!mounted) return;
-  document.documentElement.classList.toggle("dark", dark);
-  localStorage.setItem("theme", dark ? "dark" : "light");
-}, [dark, mounted]);
 
   // ===== MEMOIZED NAV ITEMS =====
   const navItems = useMemo(() => [
@@ -118,10 +113,6 @@ useEffect(() => {
             }`}
         >
           {open ? <X size={28} /> : <Camera size={28} />}
-
-          {!open && (
-            <span className="absolute inset-0 rounded-full bg-current opacity-20 animate-ping" />
-          )}
         </motion.button>
 
         {/* MENU */}

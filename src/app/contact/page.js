@@ -83,27 +83,28 @@ const ContactPage = () => {
           </div>
 
           {/* RIGHT: LARGE MAP */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative w-full h-[520px] rounded-[2.5rem] overflow-hidden border border-border shadow-2xl"
-          >
-            <iframe
-              title="voritemedia Location"
-            src="https://www.google.com/maps?q=Lucknow%20Uttar%20Pradesh%20262028&output=embed"
-              className="w-full h-full border-0 grayscale invert-[0.9] dark:invert-0"
-              loading="lazy"
-            ></iframe>
+<motion.div
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.8, delay: 0.2 }}
+  className="relative w-full h-[520px] rounded-[2.5rem] overflow-hidden border border-border shadow-2xl"
+>
+  <iframe
+    title="Voritemedia Location"
+    src="https://www.google.com/maps?q=Faridabad,Haryana&output=embed"
+    className="w-full h-full border-0 grayscale invert-[0.9] dark:invert-0"
+    loading="lazy"
+    referrerPolicy="no-referrer-when-downgrade"
+  ></iframe>
 
-            {/* MAP BADGE */}
-            <div className="absolute bottom-6 left-6 bg-background/80 backdrop-blur px-5 py-3 rounded-xl flex items-center gap-3 border border-border">
-              <MapPin size={16} className="text-blue-500" />
-              <span className="text-xs font-bold uppercase tracking-widest">
-                Based in India
-              </span>
-            </div>
-          </motion.div>
+  {/* MAP BADGE */}
+  <div className="absolute bottom-6 left-6 bg-background/80 backdrop-blur px-5 py-3 rounded-xl flex items-center gap-3 border border-border">
+    <MapPin size={16} className="text-blue-500" />
+    <span className="text-xs font-bold uppercase tracking-widest">
+      Based in India
+    </span>
+  </div>
+</motion.div>
         </motion.div>
       </div>
     </main>

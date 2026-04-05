@@ -408,19 +408,17 @@ if (!contacts.length) return <p>No data</p>;
 
     {/* Founder Content */}
     <div className="text-center md:text-left">
-      <h2 className="text-3xl font-bold tracking-tight">
-        Nishant  Tiwari
-      </h2>
+    <h2 className="text-3xl font-bold tracking-tight">
+  Vikramjeet Ray
+</h2>
 
-      <p className="text-sm text-amber-600 font-medium mt-2">
-        Founder & Creative Director, Akanis Production
-      </p>
+<p className="text-sm text-amber-500 font-medium mt-2">
+  Founder & Creative Director, Vorite Media™
+</p>
 
-      <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
-        “At Akanis Production, we don’t follow trends — we craft timeless visual
-        experiences. Every frame, every campaign, and every story is built with
-        precision, discipline, and a long-term creative vision.”
-      </p>
+<p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
+  “At Vorite Media™, we craft premium digital experiences through cinematic storytelling, modern web solutions, and powerful brand strategies. Every project is built with precision, creativity, and long-term vision.”
+</p>
     </div>
   </div>
 

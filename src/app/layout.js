@@ -6,39 +6,54 @@ import FloatingActions from "../components/common/FloatingActions";
 
 export const metadata = {
   metadataBase: new URL("https://www.voritemedia.com"),
+
   title: {
-    default: "Vorite Media | Premium Digital Agency & Video Production in Delhi NCR",
-    template: "%s | Vorite Media - Leading Creative Agency",
+    default:
+      "Vorite Media™ | #1 Digital Agency & Video Production Company in Delhi NCR",
+    template: "%s | Vorite Media™ - Creative Digital Agency",
   },
+
   description:
-    "Vorite Media is a premier full-service digital agency serving Delhi, Noida, Gurgaon, Ghaziabad, Faridabad, and Rohtak. We specialize in high-end photography, cinematic video production, web development, and strategic branding.",
+    "Vorite Media™ is a top-rated digital agency in Delhi NCR offering cinematic video production, premium photography, web development, and branding services. Trusted by brands across India.",
 
   keywords: [
-    "Digital Agency in Delhi NCR",
-    "Video Production Noida",
-    "Creative Agency Gurgaon",
-    "Photography Studio Faridabad",
-    "Website Development Ghaziabad",
-    "Branding Agency Rohtak",
-    "Corporate Film Makers Delhi",
-    "Commercial Photography NCR",
-    "E-commerce Shoot Noida",
-    "Web Design Agency Gurgaon",
+    "Best Digital Agency in Delhi NCR",
+    "Top Video Production Company India",
+    "Creative Agency Noida Gurgaon Delhi",
+    "Professional Photography Services NCR",
+    "Website Development Company India",
+    "Branding Agency India",
+    "Corporate Video Production Delhi",
+    "Ecommerce Product Shoot India",
+    "Best Marketing Agency India",
   ],
 
-  authors: [{ name: "Vorite Media Team" }],
-  creator: "Vorite Media",
-  publisher: "Vorite Media",
+  authors: [{ name: "Vorite Media™ Team" }],
+  creator: "Vorite Media™",
+  publisher: "Vorite Media™",
+
+  category: "Business & Marketing",
+
+  alternates: {
+    canonical: "https://www.voritemedia.com",
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 
   openGraph: {
-    title: "Vorite Media | Digital & Media Excellence in Delhi NCR",
+    title:
+      "Vorite Media™ | India's Leading Digital & Video Production Agency",
     description:
-      "Transforming brands through cinematic video, high-end photography, and cutting-edge web solutions across Delhi, Noida, and Gurgaon.",
+      "Helping brands grow with cinematic storytelling, powerful branding, and high-performance websites.",
     url: "https://www.voritemedia.com",
-    siteName: "Vorite Media",
+    siteName: "Vorite Media™",
     images: [
       {
-        url: "/og-image.jpg", // Ensure you have this in your public folder
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Vorite Media Digital Agency",
@@ -50,13 +65,16 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Vorite Media | Digital Agency & Video Production",
-    description: "Premium Creative & Digital Solutions for brands in Delhi NCR and beyond.",
+    title: "Vorite Media™ | Premium Digital Agency India",
+    description:
+      "We create cinematic videos, premium websites & powerful brands.",
+    creator: "@voritemedia",
   },
 
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
@@ -65,8 +83,11 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-};
 
+  verification: {
+    google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
+  },
+};
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
@@ -108,43 +129,89 @@ export default function RootLayout({ children }) {
           <Footer />
         </footer>
 
-        {/* Structured Data for Local SEO (NCR Coverage) */}
         <script
-          type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ProfessionalService",
-              "name": "Vorite Media",
-              "image": "https://www.voritemedia.com/logo.png",
-              "url": "https://www.voritemedia.com",
-              "telephone": "+91 8368507050",
-              "priceRange": "$$",
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Your Office Address",
-                "addressLocality": "Noida",
-                "addressRegion": "Uttar Pradesh",
-                "postalCode": "201301",
-                "addressCountry": "India"
-              },
-              "areaServed": [
-                { "@type": "City", "name": "Delhi" },
-                { "@type": "City", "name": "Noida" },
-                { "@type": "City", "name": "Gurgaon" },
-                { "@type": "City", "name": "Ghaziabad" },
-                { "@type": "City", "name": "Faridabad" },
-                { "@type": "City", "name": "Rohtak" }
-              ],
-              "description": "Premium digital agency and video production house serving the Delhi NCR region.",
-              "sameAs": [
-                "https://www.instagram.com/voritemedia",
-                "https://www.linkedin.com/company/voritemedia",
-                "https://www.facebook.com/voritemedia"
-              ]
-            }),
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
           }}
         />
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": ["LocalBusiness", "ProfessionalService"],
+
+      name: "Vorite Media™",
+      image: "https://www.voritemedia.com/logo.png",
+      url: "https://www.voritemedia.com",
+      telephone: "+91-8368507050",
+
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Your Exact Office Address Here",
+        addressLocality: "Faridabad",
+        addressRegion: "Haryana",
+        postalCode: "121001",
+        addressCountry: "IN",
+      },
+
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 28.3899241,
+        longitude: 77.2657876,
+      },
+
+      hasMap: "https://www.google.com/maps?q=28.3899241,77.2657876",
+
+      openingHoursSpecification: {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        opens: "10:00",
+        closes: "19:00"
+      },
+
+      priceRange: "₹₹₹",
+
+      areaServed: [
+        { "@type": "State", "name": "Haryana" },
+        { "@type": "State", "name": "Uttar Pradesh" },
+        { "@type": "State", "name": "Bihar" },
+
+        { "@type": "City", "name": "Delhi" },
+        { "@type": "City", "name": "Noida" },
+        { "@type": "City", "name": "Gurgaon" },
+        { "@type": "City", "name": "Faridabad" },
+        { "@type": "City", "name": "Ghaziabad" },
+
+        { "@type": "City", "name": "Lucknow" },
+        { "@type": "City", "name": "Kanpur" },
+        { "@type": "City", "name": "Varanasi" },
+
+        { "@type": "City", "name": "Patna" },
+        { "@type": "City", "name": "Gaya" }
+      ],
+
+      sameAs: [
+        "https://www.instagram.com/voritemedia",
+        "https://www.linkedin.com/company/voritemedia",
+        "https://www.facebook.com/voritemedia"
+      ]
+    }),
+  }}
+/>
       </body>
     </html>
   );

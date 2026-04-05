@@ -92,11 +92,20 @@ export default function Footer() {
 }
 
 function LinkItem({ icon, text, href }) {
+  const getAriaLabel = () => {
+    if (text.includes('@voritemedia')) return 'Follow us on Instagram';
+    if (text.includes('gmail.com')) return 'Send us an email';
+    if (text.includes('+91')) return 'Call us';
+    if (text.includes('canva.site')) return 'View our digital portfolio';
+    return text;
+  };
+
   return (
     <a 
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={getAriaLabel()}
       className="flex items-center gap-4 group"
     >
       <span className="w-10 h-10 rounded-full border border-border flex items-center justify-center opacity-60 group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-500">
