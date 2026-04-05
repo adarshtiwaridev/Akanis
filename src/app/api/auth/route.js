@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { authRateLimit } from "../../../lib/rateLimit";
+import { rateLimiter } from "../../../lib/rateLimiter";
 
 export async function POST(req) {
-  // Apply rate limiting
-  await new Promise((resolve, reject) => {
-    authRateLimit(req, {}, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  // Apply rate limiting: 5 attempts per 15 minutes
+  if (!rateLimiter(req, { limit: 5, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json(
+      { message: "Too many login attempts, please try again later." },
+      { status: 429 }
+    );
+  }
 
   try {
     const { email, password } = await req.json();

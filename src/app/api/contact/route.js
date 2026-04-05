@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { sendMail } from "../../../lib/email";
 import dbConnect from "../../../lib/dbConnect";
 import Contact from "../../../models/Contact";
-import { contactRateLimit } from "../../../lib/rateLimit";
+import { rateLimiter } from "../../../lib/rateLimiter";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 
@@ -69,13 +69,13 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  // Apply rate limiting
-  await new Promise((resolve, reject) => {
-    contactRateLimit(req, {}, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  // Apply rate limiting: 3 submissions per hour
+  if (!rateLimiter(req, { limit: 3, windowMs: 60 * 60 * 1000 })) {
+    return NextResponse.json(
+      { message: "Too many contact submissions, please try again later." },
+      { status: 429 }
+    );
+  }
 
   try {
     const body = await req.json();
